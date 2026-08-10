@@ -3,12 +3,17 @@ import Hero from "@/components/home/Hero";
 import PostCard from "@/components/ui/PostCard";
 import type { Post } from "@/components/ui/PostCard";
 import ProjectCard from "@/components/ui/ProjectCard";
+import { getAllPosts, formatPostDate } from "@/lib/mdx";
 import { FEATURED_PROJECTS } from "@/lib/site";
 
-// No posts published yet — the Latest Posts section shows the empty state.
-const POSTS: Post[] = [];
-
 export default function Home() {
+  const posts: Post[] = getAllPosts().map((post) => ({
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.description,
+    date: formatPostDate(post.date),
+  }));
+
   return (
     <div className="mx-auto w-full max-w-4xl px-6">
       <Hero />
@@ -35,9 +40,9 @@ export default function Home() {
           Latest Posts
         </h2>
         <div className="mt-6">
-          {POSTS.length > 0 ? (
+          {posts.length > 0 ? (
             <ul className="grid gap-4">
-              {POSTS.map((post) => (
+              {posts.map((post) => (
                 <li key={post.slug}>
                   <PostCard post={post} />
                 </li>
