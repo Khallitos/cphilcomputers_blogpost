@@ -1,0 +1,10 @@
+{
+  "slug": "check-scanner-management",
+  "name": "Check-Scanner Management Web App",
+  "tagline": "Full-stack web app that tracks check-scanner deployments across banks in Ghana.",
+  "description": "A full-stack web application for managing check-scanner deployments across multiple banks in Ghana. It centralizes deployment tracking, maintenance records, and technician assignments for the national check-clearing system. Built to give operations teams one source of truth for every scanner in the field.",
+  "stack": ["JavaScript", "PHP", "MySQL"],
+  "links": {},
+  "featured": false,
+  "year": 2020
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "first-bounty",
+  "name": "First Bounty",
+  "tagline": "First bug bounty — the journey and the findings.",
+  "description": "The first bug-bounty hunt — the journey, the methodology, and the findings. A personal record of reconnaissance techniques and vulnerability discovery, published as a portfolio of early security work.",
+  "stack": ["Security", "Reconnaissance"],
+  "links": {
+    "repo": "https://github.com/Khallitos/first-bounty"
+  },
+  "featured": false,
+  "year": 2023
+}

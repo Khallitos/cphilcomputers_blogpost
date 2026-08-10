@@ -1,0 +1,10 @@
+{
+  "slug": "intune-entra-rollout",
+  "name": "Microsoft Intune / Entra ID Rollout",
+  "tagline": "Endpoint management modernization with Intune and Entra ID.",
+  "description": "A modernization rollout that moved Marshall Oil & Gas onto Microsoft Intune and Entra ID. Covers device enrollment, conditional access, and MFA enforcement across the fleet, alongside full M365 tenant administration. Also owned the end-to-end onboarding and offboarding workflows for every user.",
+  "stack": ["Intune", "Entra ID", "Microsoft 365", "PowerShell"],
+  "links": {},
+  "featured": false,
+  "year": 2023
+}

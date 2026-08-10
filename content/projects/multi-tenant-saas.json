@@ -1,0 +1,10 @@
+{
+  "slug": "multi-tenant-saas",
+  "name": "Multi-Tenant SaaS Platform",
+  "tagline": "Multi-tenant SaaS with RBAC, JWT auth, and AES-encrypted data.",
+  "description": "A multi-tenant SaaS platform built at Belzir in Berlin. Implements role-based access control, REST APIs, JWT authentication, and AES encryption across isolated tenants. Includes a full asset-management module with performance testing and thorough documentation.",
+  "stack": ["React", "Node", "Express", "MongoDB"],
+  "links": {},
+  "featured": true,
+  "year": 2025
+}

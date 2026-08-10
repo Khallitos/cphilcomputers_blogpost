@@ -1,0 +1,12 @@
+{
+  "slug": "secure-device-onboarding",
+  "name": "Secure Device Onboarding",
+  "tagline": "Automated, security-first device onboarding.",
+  "description": "A security-focused project that automates device onboarding. Hardens the process of bringing new devices into an environment, with PowerShell automation enforcing policy from the first boot. The repo documents the design and the automation scripts.",
+  "stack": ["Security", "Automation", "PowerShell"],
+  "links": {
+    "repo": "https://github.com/Khallitos/Secure_Device_Onboarding"
+  },
+  "featured": false,
+  "year": 2024
+}

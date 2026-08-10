@@ -1,0 +1,10 @@
+{
+  "slug": "enterprise-network-deployment",
+  "name": "Enterprise-Wide Network Deployment",
+  "tagline": "Multi-site LAN/WAN build-out for an oil & gas operator.",
+  "description": "An enterprise-wide network deployment for Marshall Oil & Gas Services spanning multiple sites. Covered LAN/WAN design with FortiGate and Sophos firewalls, Active Directory, group policies, point-to-point radio links, and fiber backbone. The network ran three years with zero security incidents.",
+  "stack": ["FortiGate", "Sophos", "Active Directory", "Ubiquiti EdgeMAX", "Fiber"],
+  "links": {},
+  "featured": false,
+  "year": 2022
+}

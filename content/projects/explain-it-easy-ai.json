@@ -1,0 +1,12 @@
+{
+  "slug": "explain-it-easy-ai",
+  "name": "Explain It Easy AI",
+  "tagline": "An AI tool that explains complex topics simply.",
+  "description": "An AI-powered explanation tool that breaks complex topics down into plain language. Feed it a subject and get a simple, accurate breakdown. Built with JavaScript.",
+  "stack": ["AI", "JavaScript"],
+  "links": {
+    "repo": "https://github.com/Khallitos/explain-it-easy-ai"
+  },
+  "featured": false,
+  "year": 2025
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "time-tracker",
+  "name": "Time Tracker",
+  "tagline": "Real-time time tracking for teams, with role-based access and reporting.",
+  "description": "A MERN time-tracking app with real-time session tracking, role-based access control, and a reporting dashboard. Teams log hours as they work, while managers get live breakdowns by project and member. Designed to make timesheets something nobody dreads.",
+  "stack": ["MongoDB", "Express", "React", "Node"],
+  "links": {
+    "live": "https://timetracker-rho-lyart.vercel.app"
+  },
+  "featured": true,
+  "year": 2024
+}

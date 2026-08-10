@@ -1,0 +1,12 @@
+{
+  "slug": "sbom-attack-chain",
+  "name": "SBOM Attack-Chain Prediction",
+  "tagline": "Predicting attack chains from software bills of materials.",
+  "description": "A research project exploring how software bills of materials can be used to predict attack chains. Analyzes dependency graphs and known vulnerability data to surface exploitable paths before they are hit. Written in Python.",
+  "stack": ["Python", "Security Research"],
+  "links": {
+    "repo": "https://github.com/Khallitos/sbom-attack-chain-prediction"
+  },
+  "featured": false,
+  "year": 2025
+}
