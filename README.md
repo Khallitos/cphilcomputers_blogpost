@@ -1,7 +1,6 @@
-# cphilcomputers.com — Personal Blog & Portfolio
+# cphilcomputers.com  Personal Blog & Portfolio
 
-Personal site for Carlos Philips: data center & network engineering, Microsoft
-endpoint administration, full-stack development, and AI automation.
+Personal site for Carlos Philips.
 
 Built with Next.js (App Router, TypeScript) and Tailwind CSS. Content is
 written as MDX and JSON data files in this repository — no database, no CMS.
