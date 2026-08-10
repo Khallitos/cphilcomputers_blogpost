@@ -1,0 +1,103 @@
+import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About",
+};
+
+const LANGUAGES = [
+  { name: "English", level: "Native" },
+  { name: "Twi", level: "Native" },
+  { name: "German", level: "B1 — actively improving" },
+];
+
+export default function AboutPage() {
+  return (
+    <div className="mx-auto w-full max-w-3xl px-6 py-20">
+      {/* Hero photo */}
+      <div className="relative">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-border">
+          <Image
+            src="/images/carlos-hero.webp"
+            alt="Carlos Philips"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 48rem"
+            className="object-cover"
+          />
+        </div>
+        <Image
+          src="/images/carlos-avatar.webp"
+          alt=""
+          width={96}
+          height={96}
+          className="absolute -bottom-8 left-8 h-24 w-24 rounded-full border-4 border-background object-cover"
+        />
+      </div>
+
+      <div className="mt-16">
+        <h1 className="text-4xl font-bold tracking-tight">Hey, I&apos;m Carlos.</h1>
+
+        <div className="mt-6 space-y-4 text-base leading-relaxed text-foreground/90">
+          <p>
+            I&apos;m an IT infrastructure engineer from Offenburg, Germany, with
+            five-plus years across data centers, banking systems, and
+            oil &amp; gas industrial environments.
+          </p>
+          <p>
+            I&apos;ve spent my career where downtime isn&apos;t an option —
+            keeping a national check-clearing system alive across 100+ bank
+            workstations, running the UPS and PLC racks that keep an offshore
+            oil operation in the dark-free, and managing M365 estates for
+            hundreds of users. So far, that&apos;s a zero-error record on
+            mission-critical deployments, and I intend to keep it that way.
+          </p>
+          <p>
+            Right now I&apos;m pursuing an MSc in Enterprise &amp; IT Security at
+            Offenburg University of Applied Sciences, because I care as much
+            about keeping systems safe as I do about keeping them running. When
+            I&apos;m not hardening infrastructure, I&apos;m building full-stack
+            apps — and popping balloons on this very site.
+          </p>
+        </div>
+      </div>
+
+      {/* Languages */}
+      <section aria-labelledby="languages" className="mt-16">
+        <h2
+          id="languages"
+          className="text-2xl font-semibold tracking-tight"
+        >
+          Languages
+        </h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+          {LANGUAGES.map((language) => (
+            <li
+              key={language.name}
+              className="rounded-xl border border-border bg-surface p-5"
+            >
+              <p className="font-semibold text-foreground">{language.name}</p>
+              <p className="mt-1 text-sm text-muted">{language.level}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Fun facts teaser */}
+      <section aria-label="Fun facts" className="mt-16 pb-8">
+        <Link
+          href="/playground"
+          className="group flex flex-col gap-2 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 transition-colors hover:border-accent/70 hover:bg-accent/10"
+        >
+          <span className="text-lg font-semibold text-accent">
+            🎈 Three balloons hide three things about me.
+          </span>
+          <span className="text-sm text-muted group-hover:text-foreground">
+            Go pop them.
+          </span>
+        </Link>
+      </section>
+    </div>
+  );
+}
