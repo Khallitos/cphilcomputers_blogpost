@@ -1,0 +1,41 @@
+---
+title: "I update my blog with AI agents"
+date: 2026-08-05
+description: "How I automate publishing, monitoring, and admin workflows with n8n, Power Automate, and orchestrated AI agents — with one concrete example flow."
+tags:
+  - "ai-automation"
+  - "n8n"
+  - "workflows"
+draft: false
+---
+
+If there's one thing I've learned running IT for years, it's this: if you do the same manual task twice a week, you should automate it by now. That's why this blog — and most of my workflows — runs on AI agents.
+
+I'm not talking about a chatbot bolted onto a website. I mean real automation: event-driven workflows that watch for triggers, decide what to do, and act without me touching a keyboard.
+
+## The stack
+
+Two tools carry most of the load:
+
+- **n8n** — my self-hosted workflow engine. It handles the heavy orchestration: webhooks, API calls, branching logic, and hand-offs between agents.
+- **Power Automate** — the glue for everything Microsoft-centric, since most of my clients live in M365.
+
+On top of those sits the agent layer. Instead of hard-coding every decision, I give an LLM a narrow job, a context window with the relevant data, and a set of tools it's allowed to call. It plans, executes, and reports back — and if a step fails, the workflow catches it and retries with a different approach.
+
+## A concrete example: the publish pipeline
+
+Here's a flow I run every time I finish a post. An n8n webhook receives the draft's frontmatter (title, tags, slug) the moment I save it. The workflow then:
+
+1. Runs a **lint agent** that reads the draft and checks tone, structure, and technical accuracy against a style guide I wrote once.
+2. Routes the result: pass → move on; fail → the agent rewrites the offending sections and sends me a diff for approval.
+3. **Generates the metadata** — description, OpenGraph text, suggested tags — and updates the post frontmatter.
+4. Triggers a **build hook** on the server, then a **health-check agent** fetches the live URL and confirms the post is up with the right title and status code.
+5. Posts a short update to my social accounts via the same workflow.
+
+From "draft saved" to "live and announced," nothing needs me — unless something fails, in which case I get a message with the exact log excerpt.
+
+## Why this matters
+
+Automation isn't about removing humans. It's about removing the *mechanical* parts so the human parts — judgment, writing, architecture — get more attention. Every flow I build is a small portfolio piece: it proves I can take a messy process, model it, and make it run itself.
+
+Want to see more? I'll keep publishing the flows that survive contact with reality — including the ones that failed first.
