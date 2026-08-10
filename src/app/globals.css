@@ -53,3 +53,14 @@ body {
   background-color: var(--accent);
   color: var(--background);
 }
+
+/* Typing cursor blink (used by TypingText). */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
