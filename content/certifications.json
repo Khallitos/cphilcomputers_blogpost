@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Application Security Analyst Mastery Award",
+    "issuer": "IBM",
+    "description": "Mastery award covering the core skills of an application security analyst — secure development practices, threat modeling, and common vulnerability classes."
+  },
+  {
+    "name": "Mobile Application Development Mastery Award",
+    "issuer": "IBM",
+    "description": "Mastery award covering the end-to-end lifecycle of mobile application development, from design and build to testing and deployment."
+  }
+]
