@@ -19,7 +19,7 @@ const AIM_LINE_LEN = 84;
 const LAUNCH_SPEED = 7; // px per 16.67 ms frame
 const GRAVITY = 0.09; // px per frame^2 (at 60 fps)
 const MISS_MARGIN = 60; // off-screen margin before the arrow disappears
-const HIT_TOLERANCE = 8; // extra radius for forgiving distance collisions
+const HIT_TOLERANCE = 6; // extra radius for forgiving distance collisions
 
 type Balloon = {
   id: number;
@@ -35,7 +35,7 @@ type Balloon = {
   driftPhase: number;
   driftAmplitude: number;
   color: string;
-  secret: string;
+  hobby: string;
 };
 
 // Teal (accent), pink, amber (secondary): three distinct colors.
@@ -46,43 +46,43 @@ const BALLOONS: readonly Balloon[] = [
     id: 0,
     x: 470,
     baseY: 170,
-    radius: 36,
-    speed: 0.0058,
+    radius: 26,
+    speed: 0.008,
     phase: 0,
     amplitude: 85,
     driftSpeed: 0.0031,
     driftPhase: 0,
     driftAmplitude: 14,
     color: "var(--accent)",
-    secret: "✈️ I love travelling",
+    hobby: "✈️ I love travelling",
   },
   {
     id: 1,
     x: 590,
     baseY: 320,
-    radius: 38,
-    speed: 0.0072,
+    radius: 27,
+    speed: 0.0099,
     phase: 2.1,
     amplitude: 92,
     driftSpeed: 0.0042,
     driftPhase: 1.3,
     driftAmplitude: 16,
     color: "#f472b6",
-    secret: "🍰 I love baking",
+    hobby: "🍰 I love baking",
   },
   {
     id: 2,
     x: 700,
     baseY: 470,
-    radius: 36,
-    speed: 0.0049,
+    radius: 26,
+    speed: 0.0067,
     phase: 4.2,
     amplitude: 80,
     driftSpeed: 0.0036,
     driftPhase: 2.6,
     driftAmplitude: 13,
     color: "var(--secondary)",
-    secret: "🎮 I love video games (Fortnite)",
+    hobby: "🎮 I love video games (Fortnite)",
   },
 ];
 
@@ -430,7 +430,7 @@ export default function BalloonArrowGame() {
             if (el) el.style.display = "none";
             playPop();
             spawnConfetti(particlesRef, pidRef, particleGRef.current, bx, by, b.color);
-            setLiveMsg(`Balloon popped; secret revealed: ${b.secret}`);
+            setLiveMsg(`Balloon popped! Hobby revealed: ${b.hobby}`);
             hit = true;
             break;
           }
@@ -556,7 +556,7 @@ export default function BalloonArrowGame() {
     particlesRef.current = [];
     angleRef.current = DEFAULT_ANGLE;
     setAngle(DEFAULT_ANGLE);
-    setLiveMsg("Game reset. Pop all three balloons.");
+    setLiveMsg("Game reset. Pop all three balloons to reveal my hobbies.");
   };
 
   const toggleMusicMute = () => {
@@ -616,7 +616,7 @@ export default function BalloonArrowGame() {
     <div>
       <div
         role="application"
-        aria-label="Balloon pop game. Aim the launch angle with the up and down arrows, drag, or mouse; press space or click to fire."
+        aria-label="Balloon pop game. Pop all three balloons to reveal my hobbies. Aim with the up and down arrows, drag, or mouse; press space or click to fire."
         tabIndex={0}
         className="relative h-[460px] w-full touch-none select-none overflow-hidden rounded-2xl border border-border bg-surface outline-none focus-visible:ring-2 focus-visible:ring-accent sm:h-[600px]"
         onPointerDown={onPointerDown}
@@ -806,7 +806,7 @@ export default function BalloonArrowGame() {
               🎉
             </p>
             <p className="mt-3 text-lg font-semibold tracking-tight text-foreground">
-              You popped them all — now you know the real me 🎉
+              You popped them all! Those are my hobbies 🎉
             </p>
             <button
               type="button"
@@ -824,7 +824,7 @@ export default function BalloonArrowGame() {
         {liveMsg}
       </p>
 
-      {/* Secret slots. */}
+      {/* Hobby slots. */}
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {BALLOONS.map((b) => {
           const isRevealed = popped.includes(b.id);
@@ -839,7 +839,7 @@ export default function BalloonArrowGame() {
             >
               {isRevealed ? (
                 <p className="text-sm font-medium text-foreground">
-                  {b.secret}
+                  {b.hobby}
                 </p>
               ) : (
                 <p className="text-sm text-muted">
