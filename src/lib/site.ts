@@ -19,7 +19,7 @@ export const SITE = {
   name: "Carlos Philips",
   url: "https://cphilcomputers.com",
   roleLine:
-    "Data Center & Network Engineer · Full-Stack Developer · AI Automation",
+    "System Administrator · Full-Stack Developer · AI Automation",
   socials: [
     { label: "GitHub", href: "https://github.com/Khallitos" },
     {

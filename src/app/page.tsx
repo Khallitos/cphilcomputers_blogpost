@@ -17,7 +17,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: { absolute: SITE.name },
   description:
-    "Personal site and blog of Carlos Philips: Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
+    "Personal site and blog of Carlos Philips: System Administrator, Full-Stack Developer, and AI Automation.",
 };
 
 const LANGUAGES = [

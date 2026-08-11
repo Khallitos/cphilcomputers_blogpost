@@ -5,7 +5,7 @@ const OG_IMAGE = {
   url: "/og-default.png",
   width: 1200,
   height: 630,
-  alt: "Carlos Philips: Data Center & Network Engineer · Full-Stack Developer · AI Automation",
+  alt: "Carlos Philips: System Administrator · Full-Stack Developer · AI Automation",
 };
 
 /**
