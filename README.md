@@ -3,7 +3,7 @@
 Personal site for Carlos Philips.
 
 Built with Next.js (App Router, TypeScript) and Tailwind CSS. Content is
-written as MDX and JSON data files in this repository — no database, no CMS.
+written as MDX and JSON data files in this repository: no database, no CMS.
 
 ## Development
 

@@ -11,7 +11,7 @@ export default function NotFound() {
       </h1>
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
         Either it never existed, it moved, or it&apos;s floating somewhere it
-        shouldn&apos;t be. Head back home — or stretch your aim on the
+        shouldn&apos;t be. Head back home, or stretch your aim on the
         playground instead.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">

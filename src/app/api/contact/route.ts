@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   const ip = clientIp(req);
   if (isRateLimited(ip)) {
     return NextResponse.json(
-      { error: "Too many messages — please wait a few minutes and try again." },
+      { error: "Too many messages. Please wait a few minutes and try again." },
       { status: 429 },
     );
   }
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.log(
-      "[contact] RESEND_API_KEY not set — dev mode, message not delivered.",
+      "[contact] RESEND_API_KEY not set: dev mode, message not delivered.",
     );
     return NextResponse.json({ ok: true, note: "dev mode" });
   }
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       console.error(`[contact] Resend returned status ${res.status}`);
       return NextResponse.json(
-        { error: "Could not send the message right now — please try again later." },
+        { error: "Could not send the message right now. Please try again later." },
         { status: 502 },
       );
     }
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[contact] Resend request failed", err);
     return NextResponse.json(
-      { error: "Could not send the message right now — please try again later." },
+      { error: "Could not send the message right now. Please try again later." },
       { status: 502 },
     );
   }

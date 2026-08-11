@@ -1,8 +1,8 @@
 {
   "slug": "menuxer",
   "name": "Menuxer",
-  "tagline": "Dynamic QR codes for menus, prices, and promotions — no reprinting.",
-  "description": "A platform that turns static print menus into dynamic QR codes. Businesses update menus, prices, and promotions in real time — no reprinting, no waiting on a designer. Built for hospitality and retail, from cafés to multi-location chains.",
+  "tagline": "Dynamic QR codes for menus, prices, and promotions: no reprinting.",
+  "description": "A platform that turns static print menus into dynamic QR codes. Businesses update menus, prices, and promotions in real time, with no reprinting and no waiting on a designer. Built for hospitality and retail, from cafés to multi-location chains.",
   "stack": ["React", "Node", "MongoDB"],
   "links": {
     "live": "https://menuxer.com"

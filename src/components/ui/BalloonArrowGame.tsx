@@ -20,7 +20,7 @@ type Balloon = {
   x: number;
   baseY: number;
   radius: number;
-  /** Radians per frame — different speeds for each balloon. */
+  /** Radians per frame; different speeds for each balloon. */
   speed: number;
   phase: number;
   amplitude: number;
@@ -28,7 +28,7 @@ type Balloon = {
   secret: string;
 };
 
-// Teal (accent), pink, amber (secondary) — three distinct balloon colors.
+// Teal (accent), pink, amber (secondary): three distinct balloon colors.
 const BALLOONS: readonly Balloon[] = [
   {
     id: 0,
@@ -74,7 +74,7 @@ const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
 
 /* ------------------------------------------------------------------ */
-/* Audio — lazy AudioContext, short pop: noise burst + pitch drop      */
+/* Audio: lazy AudioContext, short pop (noise burst + pitch drop)     */
 /* ------------------------------------------------------------------ */
 
 let audioCtx: AudioContext | null = null;
@@ -270,7 +270,7 @@ export default function BalloonArrowGame() {
               setArrow(null);
               playPop();
               spawnConfetti(particlesRef, pidRef, b.x, by, b.color);
-              setLiveMsg(`Balloon popped — secret revealed: ${b.secret}`);
+              setLiveMsg(`Balloon popped; secret revealed: ${b.secret}`);
               hit = true;
               break;
             }
@@ -343,7 +343,7 @@ export default function BalloonArrowGame() {
     particlesRef.current = [];
     setArrow(null);
     setParticles([]);
-    setLiveMsg("Game reset — pop all three balloons.");
+    setLiveMsg("Game reset. Pop all three balloons.");
     setTick((t) => t + 1);
   };
 
@@ -358,7 +358,7 @@ export default function BalloonArrowGame() {
     setArrow(null);
     setParticles([]);
     setLiveMsg(
-      "All secrets revealed — travelling, baking, and video games.",
+      "All secrets revealed: travelling, baking, and video games.",
     );
     setTick((t) => t + 1);
   };
@@ -571,7 +571,7 @@ export default function BalloonArrowGame() {
               🎉
             </p>
             <p className="mt-3 text-lg font-semibold tracking-tight text-foreground">
-              You popped them all — now you know the real me 🎉
+              You popped them all. Now you know the real me 🎉
             </p>
             <button
               type="button"

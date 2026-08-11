@@ -10,24 +10,24 @@ const OG_IMAGE = {
   url: "/og-default.png",
   width: 1200,
   height: 630,
-  alt: "Carlos Philips — Data Center & Network Engineer · Full-Stack Developer · AI Automation",
+  alt: "Carlos Philips: Data Center & Network Engineer · Full-Stack Developer · AI Automation",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default: SITE.name,
-    template: "%s — Carlos Philips",
+    template: "%s · Carlos Philips",
   },
   description:
-    "Personal site and blog of Carlos Philips — Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
+    "Personal site and blog of Carlos Philips: Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
   openGraph: {
     type: "website",
     siteName: SITE.name,
     url: SITE.url,
     title: SITE.name,
     description:
-      "Personal site and blog of Carlos Philips — Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
+      "Personal site and blog of Carlos Philips: Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
     images: [OG_IMAGE],
     locale: "en_US",
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE.name,
     description:
-      "Personal site and blog of Carlos Philips — Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
+      "Personal site and blog of Carlos Philips: Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
     images: [OG_IMAGE.url],
   },
 };

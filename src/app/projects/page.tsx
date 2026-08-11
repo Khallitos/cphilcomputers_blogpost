@@ -5,7 +5,7 @@ import { getAllProjects } from "@/lib/projects";
 export const metadata = pageMetadata({
   title: "Projects",
   description:
-    "Selected projects by Carlos Philips — from a multi-tenant SaaS platform to QR restaurant menus and more.",
+    "Selected projects by Carlos Philips: from a multi-tenant SaaS platform to QR restaurant menus and more.",
   path: "/projects",
 });
 
@@ -16,7 +16,7 @@ export default async function ProjectsPage() {
     <div className="mx-auto w-full max-w-4xl px-6 py-20">
       <h1 className="text-4xl font-bold tracking-tight">Projects</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        A mix of production systems, security research, and experiments —
+        A mix of production systems, security research, and experiments,
         from bank check-scanner operations to AI tools.
       </p>
 

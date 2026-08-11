@@ -5,14 +5,14 @@ import Link from "next/link";
 export const metadata = pageMetadata({
   title: "About",
   description:
-    "About Carlos Philips — data center & network engineer, full-stack developer and AI automation enthusiast.",
+    "About Carlos Philips: data center & network engineer, full-stack developer and AI automation enthusiast.",
   path: "/about",
 });
 
 const LANGUAGES = [
   { name: "English", level: "Native" },
   { name: "Twi", level: "Native" },
-  { name: "German", level: "B1 — actively improving" },
+  { name: "German", level: "B1, actively improving" },
 ];
 
 export default function AboutPage() {
@@ -49,7 +49,7 @@ export default function AboutPage() {
             oil &amp; gas industrial environments.
           </p>
           <p>
-            I&apos;ve spent my career where downtime isn&apos;t an option —
+            I&apos;ve spent my career where downtime isn&apos;t an option:
             keeping a national check-clearing system alive across 100+ bank
             workstations, running the UPS and PLC racks that keep an offshore
             oil operation in the dark-free, and managing M365 estates for
@@ -61,7 +61,7 @@ export default function AboutPage() {
             Offenburg University of Applied Sciences, because I care as much
             about keeping systems safe as I do about keeping them running. When
             I&apos;m not hardening infrastructure, I&apos;m building full-stack
-            apps — and popping balloons on this very site.
+            apps, and popping balloons on this very site.
           </p>
         </div>
       </div>

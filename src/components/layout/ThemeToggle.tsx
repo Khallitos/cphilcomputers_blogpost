@@ -48,7 +48,7 @@ export default function ThemeToggle() {
   const mountedRef = useRef(false);
 
   // On mount: adopt the stored preference (the pre-paint script already set
-  // the attribute, so only the icon state needs to catch up — deferred to
+  // the attribute, so only the icon state needs to catch up; deferred to
   // avoid a synchronous render cascade).
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);

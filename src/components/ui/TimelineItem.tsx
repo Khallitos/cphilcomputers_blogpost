@@ -2,7 +2,7 @@ import type { Experience } from "@/data/cv";
 
 /**
  * One entry in the vertical experience timeline: dot + connector line on the
- * left, role/company/period and bullets on the right. Plain semantic DOM —
+ * left, role/company/period and bullets on the right. Plain semantic DOM;
  * fully keyboard- and screen-reader-accessible.
  */
 export default function TimelineItem({ item }: { item: Experience }) {

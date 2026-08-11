@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Datenschutz",
   description:
-    "Datenschutzerklärung für cphilcomputers.com — keine Cookies, kein Tracking, DSGVO-konform.",
+    "Datenschutzerklärung für cphilcomputers.com: keine Cookies, kein Tracking, DSGVO-konform.",
 };
 
 export default function DatenschutzPage() {

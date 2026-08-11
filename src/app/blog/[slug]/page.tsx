@@ -110,7 +110,7 @@ export default async function PostPage({ params }: PageProps) {
               rehypePlugins: [
                 [
                   rehypeHighlight,
-                  // `common` lacks PowerShell & friends — use the full language
+                  // `common` lacks PowerShell & friends; use the full language
                   // bundle so code blocks in any tech Carlos writes about get
                   // proper token spans (build-time only).
                   { languages: all },

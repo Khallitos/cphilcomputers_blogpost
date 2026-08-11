@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export const metadata = pageMetadata({
   title: "Automation Lab",
   description:
-    "Hands-on automation experiments by Carlos Philips — AI agents, infrastructure automation and self-hosted tools.",
+    "Hands-on automation experiments by Carlos Philips: AI agents, infrastructure automation and self-hosted tools.",
   path: "/automation",
 });
 
@@ -51,7 +51,7 @@ export const CARDS: AutomationCard[] = [
       </svg>
     ),
     body: [
-      "Autonomous agents that draft content, run checks, and deploy — coordinated by an orchestrator that keeps each step honest.",
+      "Autonomous agents that draft content, run checks, and deploy, coordinated by an orchestrator that keeps each step honest.",
       "Instead of one long prompt, a team of specialised agents builds, verifies, and ships while I review the pull request.",
     ],
     href: "/blog/running-my-blog-with-ai-agents",
@@ -75,7 +75,7 @@ export const CARDS: AutomationCard[] = [
       </svg>
     ),
     body: [
-      "Visual workflow automation for everything that repeats — my publish pipeline is a chain of small, testable steps.",
+      "Visual workflow automation for everything that repeats: my publish pipeline is a chain of small, testable steps.",
       "Trigger → draft → commit → deploy: one webhook starts the whole run and each step only fires when the last one passes.",
     ],
     href: "/blog/running-my-blog-with-ai-agents",
@@ -97,7 +97,7 @@ export const CARDS: AutomationCard[] = [
       </svg>
     ),
     body: [
-      "Microsoft 365 flows that grease the daily grind — approval chains, onboarding automation, and the paperwork nobody wants to redo.",
+      "Microsoft 365 flows that grease the daily grind: approval chains, onboarding automation, and the paperwork nobody wants to redo.",
       "A new starter gets accounts, docs, and equipment assigned by one flow, with every approval tracked in the audit trail.",
     ],
     href: "/blog/running-my-blog-with-ai-agents",
@@ -109,7 +109,7 @@ export default function AutomationPage() {
     <div className="mx-auto w-full max-w-3xl px-6 py-20">
       <h1 className="text-4xl font-bold tracking-tight">Automation Lab</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        The machines I build to do the boring parts — so I can do the
+        The machines I build to do the boring parts, so I can do the
         interesting ones.
       </p>
 
@@ -240,7 +240,7 @@ export default function AutomationPage() {
       </div>
 
       <p className="mt-12 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-sm leading-relaxed text-muted">
-        Automation is how I multiply my time — the workflows above run my
+        Automation is how I multiply my time; the workflows above run my
         day-to-day.
       </p>
     </div>

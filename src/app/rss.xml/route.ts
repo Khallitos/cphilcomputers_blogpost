@@ -6,9 +6,9 @@ export const dynamic = "force-static";
 
 export function GET() {
   const feed = new RSS({
-    title: `${SITE.name} — Blog`,
+    title: `${SITE.name} · Blog`,
     description:
-      "Notes on AI automation, infrastructure, networking, datacenters, and security — by Carlos Philips.",
+      "Notes on AI automation, infrastructure, networking, datacenters, and security, by Carlos Philips.",
     site_url: SITE.url,
     feed_url: `${SITE.url}/rss.xml`,
     language: "en",

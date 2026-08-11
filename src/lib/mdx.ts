@@ -10,7 +10,7 @@ export type Post = {
   description: string;
   tags: string[];
   draft: boolean;
-  /** Raw MDX body — only populated by `getPostBySlug`. */
+  /** Raw MDX body; only populated by `getPostBySlug`. */
   content: string;
 };
 

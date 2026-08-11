@@ -1,7 +1,7 @@
 ---
 title: "Intune onboarding & offboarding, done right"
 date: 2026-08-08
-description: "A practical walkthrough of user lifecycle management with Intune and Entra ID — enrollment, compliance, licensing, and clean revocation on day one."
+description: "A practical walkthrough of user lifecycle management with Intune and Entra ID: enrollment, compliance, licensing, and clean revocation on day one."
 tags:
   - "intune"
   - "entra-id"
@@ -12,22 +12,22 @@ draft: false
 
 Onboarding and offboarding are where identity hygiene lives or dies. Get them right and your tenant stays clean, compliant, and auditable. Get them wrong and you get ghost accounts, orphaned licenses, and a breach vector you'll discover too late.
 
-This is the lifecycle I implement for clients — built on Intune and Entra ID, and designed to run mostly hands-off.
+This is the lifecycle I implement for clients, built on Intune and Entra ID and designed to run mostly hands-off.
 
 ## Onboarding: from HR event to fully provisioned
 
 The whole flow should start with a single event: the HR system creates the employee record. From there:
 
 1. **Account provisioning.** Entra ID dynamic group membership plus a provisioning rule creates the user, assigns the right licenses, and drops them into the correct security groups. No manual account creation.
-2. **Device enrollment.** The user signs in on their Windows device with their work account — Entra join takes over. For remote users, Windows Autopilot pre-stages the device so it arrives ready to enroll.
+2. **Device enrollment.** The user signs in on their Windows device with their work account; Entra join takes over. For remote users, Windows Autopilot pre-stages the device so it arrives ready to enroll.
 3. **Compliance policies.** Devices are evaluated against your baseline: BitLocker on, firewall enabled, Defender up to date, disk encryption verified. Non-compliant devices get conditional access blocked from email and sensitive apps until they remediate.
-4. **App deployment.** Line-of-business apps, Office, and internal tools push via Intune — either required installs or available from Company Portal.
+4. **App deployment.** Line-of-business apps, Office, and internal tools push via Intune, either as required installs or available from Company Portal.
 
 The key metric: **time-to-productive**. With this pipeline it should be under a day, and usually under an hour, from HR event to a compliant, logged-in device.
 
 ## Offboarding: revocation first, cleanup second
 
-Offboarding is the part everyone rushes — which is exactly why it needs to be a checklist.
+Offboarding is the part everyone rushes, which is exactly why it needs to be a checklist.
 
 1. **Revoke immediately.** Disable the account, reset the password, and revoke all refresh tokens in Entra ID the moment the termination is confirmed. This kills active sessions in minutes.
 2. **Conditional access override.** Force the user into a "terminated" group that denies access to everything, even if a token somehow survives.
@@ -37,7 +37,7 @@ Offboarding is the part everyone rushes — which is exactly why it needs to be 
 
 ## Automation makes it consistent
 
-Manual steps get skipped under pressure. That's why I wire both flows into automated runbooks — an n8n workflow can watch for the HR trigger, execute the Entra ID and Intune steps via Graph API, and page a human only for the decisions that genuinely need judgment.
+Manual steps get skipped under pressure. That's why I wire both flows into automated runbooks: an n8n workflow can watch for the HR trigger, execute the Entra ID and Intune steps via Graph API, and page a human only for the decisions that genuinely need judgment.
 
 ### Offboard a user with PowerShell
 
@@ -50,16 +50,16 @@ Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrit
 # Find the leaver by UPN
 $user = Get-MgUser -Filter "userPrincipalName eq 'leaver@contoso.com'"
 
-# 1. Block sign-in immediately — kills new auth before anything else
+# 1. Block sign-in immediately (kills new auth before anything else)
 Update-MgUser -UserId $user.Id -AccountEnabled:$false
 
 # 2. Revoke all refresh tokens and active sessions
 Revoke-MgUserSignInSession -UserId $user.Id
 
 # 3. Hand off to Intune remote actions (wipe/retire) and license cleanup
-#    — scriptable via the Graph API endpoints for device actions
+#    (scriptable via the Graph API endpoints for device actions)
 ```
 
-Run it, check the audit log, and the user is neutralised in under a minute — no waiting for a human to remember the checklist.
+Run it, check the audit log, and the user is neutralised in under a minute, with no waiting for a human to remember the checklist.
 
-The result: a lifecycle that's fast, repeatable, and documented — and a tenant you can defend in an audit.
+The result: a lifecycle that's fast, repeatable, and documented, plus a tenant you can defend in an audit.

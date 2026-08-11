@@ -31,7 +31,7 @@ export const EXPERIENCE: Experience[] = [
     period: "May 2021 – Jul 2024",
     bullets: [
       "Ran Intune/Entra ID device management: enrollment, compliance policies, conditional access, MFA, and app deployment.",
-      "Administered the M365 tenant — Exchange Online, SharePoint, Teams, OneDrive, and licensing.",
+      "Administered the M365 tenant: Exchange Online, SharePoint, Teams, OneDrive, and licensing.",
       "Owned user onboarding/offboarding workflows end-to-end under Intune and M365.",
       "Maintained UPS systems, PLC racks, I/O modules, and SCADA monitoring with zero incidents.",
       "Managed multi-site LANs: firewalls, Active Directory, and group policies.",

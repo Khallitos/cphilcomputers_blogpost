@@ -1,7 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 
 /**
- * MDX component styling — shared by all blog post pages. Code blocks get a
+ * MDX component styling: shared by all blog post pages. Code blocks get a
  * simple surface panel; inline code gets a subtle chip. Fenced blocks are
  * syntax-highlighted via rehype-highlight (hljs classes) before rendering.
  */

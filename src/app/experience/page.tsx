@@ -7,7 +7,7 @@ import { SKILL_GROUPS } from "@/data/skills";
 export const metadata = pageMetadata({
   title: "Experience",
   description:
-    "Work experience, education and skills of Carlos Philips — data center & network engineering, full-stack development, AI automation.",
+    "Work experience, education and skills of Carlos Philips: data center & network engineering, full-stack development, AI automation.",
   path: "/experience",
 });
 
@@ -16,7 +16,7 @@ export default function ExperiencePage() {
     <div className="mx-auto w-full max-w-3xl px-6 py-20">
       <h1 className="text-4xl font-bold tracking-tight">Experience</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Where I&apos;ve kept critical systems running — data centers, banking,
+        Where I&apos;ve kept critical systems running: data centers, banking,
         and oil &amp; gas, newest first.
       </p>
 

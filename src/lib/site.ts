@@ -60,7 +60,7 @@ export const FEATURED_PROJECTS: Project[] = [
   {
     name: "Menuxer",
     description:
-      "Dynamic QR menus for restaurants and cafés — scan, browse, order.",
+      "Dynamic QR menus for restaurants and cafés: scan, browse, order.",
     tech: ["QR", "React", "Node.js"],
     href: "https://menuxer.com",
   },

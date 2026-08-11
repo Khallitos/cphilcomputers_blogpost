@@ -17,7 +17,7 @@ export default function PostCard({ post }: { post?: Post }) {
       <div className="rounded-xl border border-dashed border-border bg-surface/50 px-6 py-14 text-center">
         <p className="font-medium text-foreground">No posts yet</p>
         <p className="mt-2 text-sm text-muted">
-          The first post is on its way — check back soon.
+          The first post is on its way. Check back soon.
         </p>
       </div>
     );

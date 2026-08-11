@@ -44,13 +44,13 @@ export default function ContactForm() {
         } | null;
         setStatus({
           kind: "error",
-          message: body?.error ?? "Something went wrong — please try again.",
+          message: body?.error ?? "Something went wrong. Please try again.",
         });
       }
     } catch {
       setStatus({
         kind: "error",
-        message: "Network error — please check your connection and try again.",
+        message: "Network error. Please check your connection and try again.",
       });
     }
   }
@@ -62,7 +62,7 @@ export default function ContactForm() {
           role="status"
           className="rounded-lg border border-accent/40 bg-surface px-4 py-3 text-sm text-accent"
         >
-          Message sent — thanks for reaching out! I&apos;ll get back to you
+          Message sent. Thanks for reaching out! I&apos;ll get back to you
           soon.
         </div>
       )}
@@ -107,7 +107,7 @@ export default function ContactForm() {
         </div>
       </div>
 
-      {/* Honeypot — hidden from humans and screen readers; bots fill it in. */}
+      {/* Honeypot: hidden from humans and screen readers; bots fill it in. */}
       <div aria-hidden="true" className="sr-only">
         <label htmlFor="website">Website</label>
         <input
