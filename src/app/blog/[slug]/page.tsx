@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeHighlight from "rehype-highlight";
+import { all } from "lowlight";
 import "highlight.js/styles/github-dark.css";
 import { getAllPosts, getPostBySlug, formatPostDate } from "@/lib/mdx";
 import { SITE } from "@/lib/site";
@@ -104,7 +105,19 @@ export default async function PostPage({ params }: PageProps) {
         <MDXRemote
           source={post.content}
           components={mdxComponents}
-          options={{ mdxOptions: { rehypePlugins: [rehypeHighlight] } }}
+          options={{
+            mdxOptions: {
+              rehypePlugins: [
+                [
+                  rehypeHighlight,
+                  // `common` lacks PowerShell & friends — use the full language
+                  // bundle so code blocks in any tech Carlos writes about get
+                  // proper token spans (build-time only).
+                  { languages: all },
+                ],
+              ],
+            },
+          }}
         />
       </div>
 
