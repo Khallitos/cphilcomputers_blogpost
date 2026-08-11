@@ -9,7 +9,12 @@ module.exports = {
       numberOfRuns: 1,
       startServerCommand: "npm run start",
       startServerReadyPattern: "Ready in",
+      startServerReadyTimeout: 60000,
       url: ["http://localhost:3000/", "http://localhost:3000/blog"],
+      settings: {
+        throttlingMethod: "simulate",
+        chromeFlags: ["--no-sandbox", "--headless"],
+      },
     },
     assert: {
       assertions: {
