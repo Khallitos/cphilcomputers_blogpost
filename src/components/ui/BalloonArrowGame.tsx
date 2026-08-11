@@ -207,8 +207,9 @@ export default function BalloonArrowGame() {
   const [tick, setTick] = useState(0);
   const [bowY, setBowY] = useState(VB_H / 2);
   const [popped, setPopped] = useState<number[]>([]);
-  const [revealed, setRevealed] = useState<string[]>([]);
   const [liveMsg, setLiveMsg] = useState("");
+  const [arrow, setArrow] = useState<{ x: number; y: number } | null>(null);
+  const [particles, setParticles] = useState<Particle[]>([]);
 
   const tickRef = useRef(0);
   const reducedMotionRef = useRef(false);
@@ -220,8 +221,10 @@ export default function BalloonArrowGame() {
   const pidRef = useRef(0);
 
   // Keep refs in sync for the animation loop (no extra renders).
-  tickRef.current = tick;
-  reducedMotionRef.current = reducedMotion;
+  useEffect(() => {
+    tickRef.current = tick;
+    reducedMotionRef.current = reducedMotion;
+  }, [tick, reducedMotion]);
 
   const allPopped = popped.length === BALLOONS.length;
 
@@ -246,8 +249,10 @@ export default function BalloonArrowGame() {
 
         if (arrowProgressRef.current >= 1) {
           arrowRef.current = null;
+          setArrow(null);
         } else {
           const tickVal = tickRef.current;
+          let hit = false;
           for (const b of BALLOONS) {
             if (poppedRef.current.includes(b.id)) continue;
             const by = reducedMotionRef.current ? b.baseY : balloonY(b, tickVal);
@@ -260,21 +265,23 @@ export default function BalloonArrowGame() {
               poppedRef.current = [...poppedRef.current, b.id];
               revealedRef.current = [...revealedRef.current, b.secret];
               setPopped(poppedRef.current);
-              setRevealed(revealedRef.current);
               arrowRef.current = null;
               arrowProgressRef.current = 0;
+              setArrow(null);
               playPop();
               spawnConfetti(particlesRef, pidRef, b.x, by, b.color);
               setLiveMsg(`Balloon popped — secret revealed: ${b.secret}`);
+              hit = true;
               break;
             }
           }
+          if (!hit) setArrow({ x: arrow.x, y: arrow.y });
         }
       }
 
       // Confetti physics (gravity; skipped under reduced motion).
       const gravity = reducedMotionRef.current ? 0 : 0.09;
-      particlesRef.current = particlesRef.current
+      const aliveParticles = particlesRef.current
         .map((p) => ({
           ...p,
           x: p.x + p.vx * (dt / 16.67),
@@ -283,6 +290,13 @@ export default function BalloonArrowGame() {
           life: p.life - dt,
         }))
         .filter((p) => p.life > 0);
+      particlesRef.current = aliveParticles;
+      if (aliveParticles.length > 0) {
+        setParticles([...aliveParticles]);
+      } else {
+        // Clear the render copy only when it still has particles.
+        setParticles((prev) => (prev.length === 0 ? prev : []));
+      }
 
       const animating =
         Boolean(arrowRef.current) ||
@@ -313,8 +327,10 @@ export default function BalloonArrowGame() {
   const fire = () => {
     if (arrowRef.current || allPopped) return;
     ensureAudio();
-    arrowRef.current = { x: BOW_X + 8, y: bowY };
+    const fired = { x: BOW_X + 8, y: bowY };
+    arrowRef.current = fired;
     arrowProgressRef.current = 0;
+    setArrow(fired);
     setTick((t) => t + 1);
   };
 
@@ -322,10 +338,11 @@ export default function BalloonArrowGame() {
     poppedRef.current = [];
     setPopped([]);
     revealedRef.current = [];
-    setRevealed([]);
     arrowRef.current = null;
     arrowProgressRef.current = 0;
     particlesRef.current = [];
+    setArrow(null);
+    setParticles([]);
     setLiveMsg("Game reset — pop all three balloons.");
     setTick((t) => t + 1);
   };
@@ -335,10 +352,11 @@ export default function BalloonArrowGame() {
     poppedRef.current = BALLOONS.map((b) => b.id);
     revealedRef.current = BALLOONS.map((b) => b.secret);
     setPopped(poppedRef.current);
-    setRevealed(revealedRef.current);
     arrowRef.current = null;
     arrowProgressRef.current = 0;
     particlesRef.current = [];
+    setArrow(null);
+    setParticles([]);
     setLiveMsg(
       "All secrets revealed — travelling, baking, and video games.",
     );
@@ -375,9 +393,6 @@ export default function BalloonArrowGame() {
   };
 
   /* --------------------------- render ------------------------------ */
-
-  const arrow = arrowRef.current;
-  const particles = particlesRef.current;
 
   return (
     <div>
