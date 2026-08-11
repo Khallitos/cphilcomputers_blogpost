@@ -90,4 +90,15 @@ export const SKILL_GROUPS: SkillGroup[] = [
     group: "Cloud & VCS",
     skills: ["AWS", "Git", "GitHub", "GitLab", "Bitbucket"],
   },
+  {
+    group: "Soft Skills",
+    skills: [
+      "Security awareness",
+      "Vendor coordination",
+      "Problem-solving",
+      "Technical documentation",
+      "Teamwork",
+      "Training & mentoring",
+    ],
+  },
 ];
