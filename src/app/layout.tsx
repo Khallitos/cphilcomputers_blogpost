@@ -41,7 +41,9 @@ export const metadata: Metadata = {
 };
 
 // Sets the theme before first paint to avoid a flash of the wrong theme.
-const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");var d=t==="light"?"light":"dark";document.documentElement.setAttribute("data-theme",d);}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();`;
+// Standard pattern: only touch the attribute when the visitor has a stored
+// preference; otherwise the server default (dark) already on the tag stays.
+const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
 
 const personJsonLd = {
   "@context": "https://schema.org",
@@ -59,7 +61,7 @@ const personJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" className="h-full antialiased">
+    <html lang="en" data-theme="dark" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <Script
           id="theme-init"
