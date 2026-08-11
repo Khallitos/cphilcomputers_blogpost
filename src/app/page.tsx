@@ -26,10 +26,9 @@ const LANGUAGES = [
   { name: "German", level: "B1, actively improving" },
 ];
 
-function SectionHeading({ index, title }: { index?: string; title: string }) {
+function SectionHeading({ title }: { title: string }) {
   return (
     <div className="flex items-baseline gap-3">
-      {index && <span className="font-mono text-sm text-accent">{index}.</span>}
       <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         {title}
       </h2>
@@ -86,7 +85,7 @@ export default async function Home() {
       {/* About */}
       <section id="about" aria-labelledby="about-heading" className="px-6">
         <div className="mx-auto w-full max-w-4xl py-24">
-          <SectionHeading index="01" title="About" />
+          <SectionHeading title="About" />
           <div className="mt-10 flex flex-col items-center gap-10 sm:flex-row sm:items-start">
             <div className="relative shrink-0">
               <Image
@@ -149,10 +148,10 @@ export default async function Home() {
 
           <Link
             href="/playground"
-            className="group mt-12 flex flex-col gap-2 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 transition-colors hover:border-accent/70 hover:bg-accent/10"
+            className="group mt-12 flex flex-col gap-2 rounded-xl border border-border/60 bg-surface/40 p-6 transition-colors hover:border-border/80"
           >
             <span className="text-lg font-semibold text-accent">
-              🎈 Three balloons hide three things about me.
+              Three balloons hide three things about me.
             </span>
             <span className="text-sm text-muted group-hover:text-foreground">
               Go pop them.
@@ -168,7 +167,7 @@ export default async function Home() {
         className="px-6"
       >
         <div className="mx-auto w-full max-w-4xl py-24">
-          <SectionHeading index="02" title="Experience" />
+          <SectionHeading title="Experience" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             Where I&apos;ve kept critical systems running: data centers,
             banking, and oil &amp; gas, newest first.
@@ -215,7 +214,7 @@ export default async function Home() {
         className="px-6"
       >
         <div className="mx-auto w-full max-w-4xl py-24">
-          <SectionHeading index="03" title="Projects" />
+          <SectionHeading title="Projects" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             A mix of production systems, security research, and experiments,
             from bank check-scanner operations to AI tools.
@@ -234,7 +233,7 @@ export default async function Home() {
       {/* Skills */}
       <section id="skills" aria-labelledby="skills-heading" className="px-6">
         <div className="mx-auto w-full max-w-3xl py-24">
-          <SectionHeading index="04" title="Skills" />
+          <SectionHeading title="Skills" />
           <div className="mt-12 space-y-8">
             {SKILL_GROUPS.map((group) => (
               <div key={group.group}>
@@ -259,7 +258,7 @@ export default async function Home() {
         className="px-6"
       >
         <div className="mx-auto w-full max-w-3xl py-24">
-          <SectionHeading index="05" title="Certifications" />
+          <SectionHeading title="Certifications" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             Courses and mastery awards that back up the work.
           </p>
@@ -312,7 +311,7 @@ export default async function Home() {
             ))}
           </ul>
 
-          <p className="mt-12 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-sm leading-relaxed text-muted">
+          <p className="mt-12 rounded-xl border border-border/60 bg-surface/40 p-6 text-sm leading-relaxed text-muted">
             More certifications incoming as I progress through my MSc.
           </p>
         </div>
@@ -325,7 +324,7 @@ export default async function Home() {
         className="px-6"
       >
         <div className="mx-auto w-full max-w-3xl py-24">
-          <SectionHeading index="06" title="Automation Lab" />
+          <SectionHeading title="Automation Lab" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             The machines I build to do the boring parts, so I can do the
             interesting ones.
@@ -453,7 +452,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <p className="mt-12 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-sm leading-relaxed text-muted">
+          <p className="mt-12 rounded-xl border border-border/60 bg-surface/40 p-6 text-sm leading-relaxed text-muted">
             Automation is how I multiply my time; the workflows above run my
             day-to-day.
           </p>
@@ -482,7 +481,7 @@ export default async function Home() {
       {/* Contact */}
       <section id="contact" aria-labelledby="contact-heading" className="px-6">
         <div className="mx-auto w-full max-w-3xl py-24 pb-32">
-          <SectionHeading index="07" title="Get in touch" />
+          <SectionHeading title="Get in touch" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             I&apos;m open to IT support, developer, and AI automation roles.
             Whether you have a question, an idea, or just want to say hi, my
