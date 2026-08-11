@@ -12,7 +12,7 @@ module.exports = {
       startServerReadyTimeout: 60000,
       url: ["http://localhost:3000/", "http://localhost:3000/blog"],
       settings: {
-        throttlingMethod: "simulate",
+        preset: "desktop",
         chromeFlags: ["--no-sandbox", "--headless"],
       },
     },
