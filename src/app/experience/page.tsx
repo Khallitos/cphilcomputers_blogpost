@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import SkillBadge from "@/components/ui/SkillBadge";
 import TimelineItem from "@/components/ui/TimelineItem";
 import { EDUCATION, EXPERIENCE } from "@/data/cv";
 import { SKILL_GROUPS } from "@/data/skills";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Experience",
-};
+  description:
+    "Work experience, education and skills of Carlos Philips — data center & network engineering, full-stack development, AI automation.",
+  path: "/experience",
+});
 
 export default function ExperiencePage() {
   return (

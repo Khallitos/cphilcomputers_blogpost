@@ -1,9 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import BalloonGame from "@/components/ui/BalloonGame";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Playground",
-};
+  description:
+    "A collection of playful interactive experiments by Carlos Philips — balloon games and other small web toys.",
+  path: "/playground",
+});
 
 export default function PlaygroundPage() {
   return (

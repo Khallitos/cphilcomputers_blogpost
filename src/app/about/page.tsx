@@ -1,10 +1,13 @@
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
-import type { Metadata } from "next";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "About",
-};
+  description:
+    "About Carlos Philips — data center & network engineer, full-stack developer and AI automation enthusiast.",
+  path: "/about",
+});
 
 const LANGUAGES = [
   { name: "English", level: "Native" },

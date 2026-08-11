@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { getAllProjects } from "@/lib/projects";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Projects",
-};
+  description:
+    "Selected projects by Carlos Philips — from a multi-tenant SaaS platform to QR restaurant menus and more.",
+  path: "/projects",
+});
 
 export default async function ProjectsPage() {
   const projects = await getAllProjects();

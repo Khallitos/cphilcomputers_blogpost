@@ -1,10 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Certifications",
-};
+  description:
+    "Certifications of Carlos Philips across networking, infrastructure and cloud technologies.",
+  path: "/certifications",
+});
 
 export type Certification = {
   name: string;

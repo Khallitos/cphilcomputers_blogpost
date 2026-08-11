@@ -1,9 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Automation Lab",
-};
+  description:
+    "Hands-on automation experiments by Carlos Philips — AI agents, infrastructure automation and self-hosted tools.",
+  path: "/automation",
+});
 
 type AutomationCard = {
   title: string;

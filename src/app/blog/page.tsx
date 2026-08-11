@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import BlogArchive from "./BlogArchive";
 import { getAllPosts, getAllTags, formatPostDate } from "@/lib/mdx";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Blog",
   description:
     "Notes on AI automation, infrastructure, networking, datacenters, and security — by Carlos Philips.",
-};
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const posts = getAllPosts().map((post) => ({

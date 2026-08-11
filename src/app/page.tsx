@@ -1,10 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Hero from "@/components/home/Hero";
 import PostCard from "@/components/ui/PostCard";
 import type { Post } from "@/components/ui/PostCard";
 import ProjectCard from "@/components/ui/ProjectCard";
 import { getAllPosts, formatPostDate } from "@/lib/mdx";
-import { FEATURED_PROJECTS } from "@/lib/site";
+import { FEATURED_PROJECTS, SITE } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: { absolute: SITE.name },
+  description:
+    "Personal site and blog of Carlos Philips — Data Center & Network Engineer, Full-Stack Developer, and AI Automation.",
+};
 
 export default function Home() {
   const posts: Post[] = getAllPosts().map((post) => ({

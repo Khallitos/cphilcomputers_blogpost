@@ -24,6 +24,7 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    alternates: { canonical: `${SITE.url}/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.description,
@@ -32,6 +33,13 @@ export async function generateMetadata({
       publishedTime: post.date,
       tags: post.tags,
       siteName: SITE.name,
+      images: [{ url: "/og-default.png", width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: ["/og-default.png"],
     },
   };
 }
@@ -48,6 +56,20 @@ export default async function PostPage({ params }: PageProps) {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-6 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.description,
+            datePublished: post.date,
+            url: `${SITE.url}/blog/${post.slug}`,
+            author: { "@type": "Person", name: SITE.name, url: SITE.url },
+          }),
+        }}
+      />
       <Link
         href="/blog"
         className="text-sm font-medium text-accent transition-colors hover:text-secondary"
