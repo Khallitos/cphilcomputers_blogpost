@@ -21,6 +21,7 @@ export const SITE = {
   roleLine:
     "System Administrator · Full-Stack Developer · AI Automation",
   socials: [
+    { label: "Website", href: "https://cphilcomputers.com" },
     { label: "GitHub", href: "https://github.com/Khallitos" },
     {
       label: "LinkedIn",
