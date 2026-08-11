@@ -1,18 +1,5 @@
-import dynamic from "next/dynamic";
 import type { Metadata } from "next";
-
-const BalloonArrowGame = dynamic(
-  () => import("@/components/ui/BalloonArrowGame"),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="h-[460px] w-full animate-pulse rounded-2xl border border-border bg-surface sm:h-[600px]"
-      />
-    ),
-  },
-);
+import BalloonGame from "@/components/ui/BalloonGame";
 
 export const metadata: Metadata = {
   title: "Playground",
@@ -27,7 +14,7 @@ export default function PlaygroundPage() {
       </p>
 
       <div className="mt-12">
-        <BalloonArrowGame />
+        <BalloonGame />
       </div>
 
       <p className="mt-12 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-sm leading-relaxed text-muted">
