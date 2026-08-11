@@ -39,4 +39,27 @@ Offboarding is the part everyone rushes — which is exactly why it needs to be 
 
 Manual steps get skipped under pressure. That's why I wire both flows into automated runbooks — an n8n workflow can watch for the HR trigger, execute the Entra ID and Intune steps via Graph API, and page a human only for the decisions that genuinely need judgment.
 
+### Offboard a user with PowerShell
+
+When you need to do it by hand, the Microsoft Graph PowerShell SDK turns the checklist above into a few commands:
+
+```powershell
+# Connect with just the scopes the offboarding needs
+Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All"
+
+# Find the leaver by UPN
+$user = Get-MgUser -Filter "userPrincipalName eq 'leaver@contoso.com'"
+
+# 1. Block sign-in immediately — kills new auth before anything else
+Update-MgUser -UserId $user.Id -AccountEnabled:$false
+
+# 2. Revoke all refresh tokens and active sessions
+Revoke-MgUserSignInSession -UserId $user.Id
+
+# 3. Hand off to Intune remote actions (wipe/retire) and license cleanup
+#    — scriptable via the Graph API endpoints for device actions
+```
+
+Run it, check the audit log, and the user is neutralised in under a minute — no waiting for a human to remember the checklist.
+
 The result: a lifecycle that's fast, repeatable, and documented — and a tenant you can defend in an audit.

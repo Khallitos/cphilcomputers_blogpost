@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import PostCard from "@/components/ui/PostCard";
 
 export type ArchivePost = {
@@ -13,16 +14,38 @@ export type ArchivePost = {
 
 /**
  * Client-side blog archive: tag filter chips + title search, plain JS only.
+ * The active tag is initialized from the `?tag=` URL query param and kept in
+ * sync with the URL so /blog?tag=<tag> links work on load and stay shareable.
  */
-export default function BlogArchive({
+function BlogArchiveInner({
   posts,
   tags,
 }: {
   posts: ArchivePost[];
   tags: string[];
 }) {
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [activeTag, setActiveTag] = useState<string | null>(() => {
+    const tag = searchParams.get("tag");
+    return tag && tags.includes(tag) ? tag : null;
+  });
   const [query, setQuery] = useState("");
+
+  const selectTag = (tag: string | null) => {
+    setActiveTag(tag);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tag) {
+      params.set("tag", tag);
+      router.replace(`/blog?${params.toString()}`, { scroll: false });
+    } else {
+      params.delete("tag");
+      router.replace(params.size > 0 ? `/blog?${params.toString()}` : "/blog", {
+        scroll: false,
+      });
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -51,7 +74,7 @@ export default function BlogArchive({
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filter posts by tag">
           <button
             type="button"
-            onClick={() => setActiveTag(null)}
+            onClick={() => selectTag(null)}
             aria-pressed={activeTag === null}
             className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
               activeTag === null
@@ -65,7 +88,7 @@ export default function BlogArchive({
             <button
               key={tag}
               type="button"
-              onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+              onClick={() => selectTag(activeTag === tag ? null : tag)}
               aria-pressed={activeTag === tag}
               className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
                 activeTag === tag
@@ -106,5 +129,26 @@ export default function BlogArchive({
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * Suspense boundary keeps the static shell of /blog prerendered while the
+ * client component reads ?tag= from the URL after hydration.
+ */
+export default function BlogArchive(props: {
+  posts: ArchivePost[];
+  tags: string[];
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-10" aria-busy="true">
+          <p className="text-sm text-muted">Loading posts…</p>
+        </div>
+      }
+    >
+      <BlogArchiveInner {...props} />
+    </Suspense>
   );
 }

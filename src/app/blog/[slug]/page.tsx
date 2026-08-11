@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
 import { getAllPosts, getPostBySlug, formatPostDate } from "@/lib/mdx";
 import { SITE } from "@/lib/site";
 import { mdxComponents } from "./mdx-components";
@@ -99,7 +101,11 @@ export default async function PostPage({ params }: PageProps) {
       </header>
 
       <div className="mt-8">
-        <MDXRemote source={post.content} components={mdxComponents} />
+        <MDXRemote
+          source={post.content}
+          components={mdxComponents}
+          options={{ mdxOptions: { rehypePlugins: [rehypeHighlight] } }}
+        />
       </div>
 
       <footer className="mt-16 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
