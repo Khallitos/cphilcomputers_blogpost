@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Hero from "@/components/home/Hero";
+import ExperienceRow from "@/components/home/ExperienceRow";
 import ProjectCard from "@/components/ui/ProjectCard";
 import SkillBadge from "@/components/ui/SkillBadge";
-import TimelineItem from "@/components/ui/TimelineItem";
+import PostCard from "@/components/ui/PostCard";
 import { EDUCATION, EXPERIENCE } from "@/data/cv";
 import { SKILL_GROUPS } from "@/data/skills";
 import { getAllProjects } from "@/lib/projects";
+import { getAllPosts, formatPostDate } from "@/lib/mdx";
 import { getCertifications } from "@/app/certifications/page";
 import { CARDS, PIPELINE } from "@/app/automation/page";
 import { SITE } from "@/lib/site";
@@ -23,10 +26,10 @@ const LANGUAGES = [
   { name: "German", level: "B1, actively improving" },
 ];
 
-function SectionHeading({ index, title }: { index: string; title: string }) {
+function SectionHeading({ index, title }: { index?: string; title: string }) {
   return (
     <div className="flex items-baseline gap-3">
-      <span className="font-mono text-sm text-accent">{index}.</span>
+      {index && <span className="font-mono text-sm text-accent">{index}.</span>}
       <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         {title}
       </h2>
@@ -34,14 +37,47 @@ function SectionHeading({ index, title }: { index: string; title: string }) {
   );
 }
 
+function MoreLink({
+  href,
+  external = false,
+  children,
+}: {
+  href: string;
+  external?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <p className="mt-10">
+      <a
+        href={href}
+        {...(external
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
+        className="group inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-secondary"
+      >
+        <span>{children}</span>
+        <span
+          aria-hidden="true"
+          className="transition-transform group-hover:translate-x-0.5"
+        >
+          →
+        </span>
+      </a>
+    </p>
+  );
+}
+
 export default async function Home() {
-  const projects = (await getAllProjects()).map((project) => ({
-    name: project.name,
-    description: project.tagline,
-    tech: project.stack,
-    href: project.links?.live ?? `/projects/${project.slug}`,
-  }));
+  const projects = await getAllProjects();
   const certifications = await getCertifications();
+  const posts = getAllPosts()
+    .slice(0, 3)
+    .map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.description,
+      date: formatPostDate(post.date),
+    }));
 
   return (
     <div>
@@ -49,30 +85,50 @@ export default async function Home() {
 
       {/* About */}
       <section id="about" aria-labelledby="about-heading" className="px-6">
-        <div className="mx-auto w-full max-w-3xl py-24">
+        <div className="mx-auto w-full max-w-4xl py-24">
           <SectionHeading index="01" title="About" />
-          <div className="mt-10 space-y-4 text-base leading-relaxed text-foreground/90">
-            <p>
-              I&apos;m an IT infrastructure engineer from Offenburg, Germany,
-              with five-plus years across data centers, banking systems, and
-              oil &amp; gas industrial environments.
-            </p>
-            <p>
-              I&apos;ve spent my career where downtime isn&apos;t an option:
-              keeping a national check-clearing system alive across 100+ bank
-              workstations, running the UPS and PLC racks that keep an offshore
-              oil operation in the dark-free, and managing M365 estates for
-              hundreds of users. So far, that&apos;s a zero-error record on
-              mission-critical deployments, and I intend to keep it that way.
-            </p>
-            <p>
-              Right now I&apos;m pursuing an MSc in Enterprise &amp; IT
-              Security at Offenburg University of Applied Sciences, because I
-              care as much about keeping systems safe as I do about keeping
-              them running. When I&apos;m not hardening infrastructure,
-              I&apos;m building full-stack apps, and popping balloons on this
-              very site.
-            </p>
+          <div className="mt-10 flex flex-col items-center gap-10 sm:flex-row sm:items-start">
+            <div className="relative shrink-0">
+              <Image
+                src="/images/carlos-hero.webp"
+                alt="Carlos Philips"
+                width={852}
+                height={852}
+                priority
+                className="w-56 rounded-2xl border-2 border-accent/40 object-cover shadow-xl shadow-black/40 sm:w-64"
+              />
+              <Image
+                src="/images/carlos-avatar.webp"
+                alt=""
+                width={512}
+                height={512}
+                className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full border-4 border-background object-cover"
+              />
+            </div>
+            <div className="space-y-4 text-base leading-relaxed text-foreground/90">
+              <p>
+                I&apos;m an IT infrastructure engineer from Offenburg, Germany,
+                with five-plus years across data centers, banking systems, and
+                oil &amp; gas industrial environments.
+              </p>
+              <p>
+                I&apos;ve spent my career where downtime isn&apos;t an option:
+                keeping a national check-clearing system alive across 100+ bank
+                workstations, running the UPS and PLC racks that keep an
+                offshore oil operation in the dark-free, and managing M365
+                estates for hundreds of users. So far, that&apos;s a zero-error
+                record on mission-critical deployments, and I intend to keep it
+                that way.
+              </p>
+              <p>
+                Right now I&apos;m pursuing an MSc in Enterprise &amp; IT
+                Security at Offenburg University of Applied Sciences, because I
+                care as much about keeping systems safe as I do about keeping
+                them running. When I&apos;m not hardening infrastructure,
+                I&apos;m building full-stack apps, and popping balloons on this
+                very site.
+              </p>
+            </div>
           </div>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-3">
@@ -109,26 +165,28 @@ export default async function Home() {
         aria-labelledby="experience-heading"
         className="px-6"
       >
-        <div className="mx-auto w-full max-w-3xl py-24">
+        <div className="mx-auto w-full max-w-4xl py-24">
           <SectionHeading index="02" title="Experience" />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
             Where I&apos;ve kept critical systems running: data centers,
             banking, and oil &amp; gas, newest first.
           </p>
 
-          <ol className="mt-12">
+          <ol className="mt-12 space-y-12">
             {EXPERIENCE.map((item) => (
-              <TimelineItem
+              <ExperienceRow
                 key={`${item.company}-${item.role}`}
                 item={item}
               />
             ))}
           </ol>
 
+          <MoreLink href="/resume.pdf" external>
+            View Full Résumé
+          </MoreLink>
+
           <div className="mt-20">
-            <h3 className="text-xl font-semibold tracking-tight">
-              Education
-            </h3>
+            <h3 className="text-xl font-semibold tracking-tight">Education</h3>
             <ul className="mt-6 space-y-4">
               {EDUCATION.map((entry) => (
                 <li
@@ -163,24 +221,11 @@ export default async function Home() {
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
-              <ProjectCard key={project.name} project={project} />
+              <ProjectCard key={project.slug} project={project} />
             ))}
           </div>
 
-          <p className="mt-10">
-            <Link
-              href="/projects"
-              className="group inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-secondary"
-            >
-              <span>View all projects</span>
-              <span
-                aria-hidden="true"
-                className="transition-transform group-hover:translate-x-0.5"
-              >
-                →
-              </span>
-            </Link>
-          </p>
+          <MoreLink href="/projects">View Full Project Archive</MoreLink>
         </div>
       </section>
 
@@ -410,6 +455,25 @@ export default async function Home() {
             Automation is how I multiply my time; the workflows above run my
             day-to-day.
           </p>
+        </div>
+      </section>
+
+      {/* Blog */}
+      <section id="blog" aria-labelledby="blog-heading" className="px-6">
+        <div className="mx-auto w-full max-w-4xl py-24">
+          <SectionHeading title="Blog" />
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
+            Notes from the trenches: AI automation, infrastructure,
+            networking, and security.
+          </p>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+
+          <MoreLink href="/blog">View all posts</MoreLink>
         </div>
       </section>
 

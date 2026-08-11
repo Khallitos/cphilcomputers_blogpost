@@ -4,6 +4,7 @@ export type Experience = {
   location: string;
   period: string;
   bullets: string[];
+  tags: string[];
 };
 
 export type Education = {
@@ -23,6 +24,7 @@ export const EXPERIENCE: Experience[] = [
       "Built a multi-tenant SaaS platform with role-based access control, REST APIs, JWT authentication, and AES encryption.",
       "Delivered an asset-tracking system with thorough documentation and performance testing.",
     ],
+    tags: ["React", "Node", "RBAC", "JWT", "AES"],
   },
   {
     role: "IT Support Technician (Executive)",
@@ -41,6 +43,16 @@ export const EXPERIENCE: Experience[] = [
       "Managed the IT procurement budget and vendor/SLA relationships.",
       "Wrote SOPs and MOC documentation; trained 20+ staff.",
     ],
+    tags: [
+      "Intune",
+      "Entra ID",
+      "M365",
+      "SCADA",
+      "Active Directory",
+      "FortiGate",
+      "Sophos",
+      "Fiber",
+    ],
   },
   {
     role: "IT Support Specialist / Check Processing System Technician",
@@ -55,6 +67,7 @@ export const EXPERIENCE: Experience[] = [
       "Fixed network faults: IP conflicts, DNS/DHCP issues, and physical-layer problems.",
       "Enforced cybersecurity policies for 50+ users and trained end users.",
     ],
+    tags: ["Check clearing", "Data center", "Networking", "Python"],
   },
 ];
 

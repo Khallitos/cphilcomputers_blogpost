@@ -24,23 +24,24 @@ export const SITE = {
     { label: "GitHub", href: "https://github.com/Khallitos" },
     {
       label: "LinkedIn",
-      href: "https://linkedin.com/in/carlosphilips66774216a",
+      href: "https://www.linkedin.com/in/carlos-philips-66774216a/",
     },
     { label: "Instagram", href: "https://instagram.com/carl_philzz" },
+    { label: "YouTube", href: "https://www.youtube.com/@AfroFusionBuzz" },
     { label: "Email", href: "mailto:carlphil9924@gmail.com" },
   ] satisfies SocialLink[],
 } as const;
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "About", href: "/#about" },
-  { label: "Experience", href: "/#experience" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Skills", href: "/#skills" },
-  { label: "Certifications", href: "/#certifications" },
-  { label: "Automation", href: "/#automation" },
+  { label: "01. About", href: "/#about" },
+  { label: "02. Experience", href: "/#experience" },
+  { label: "03. Projects", href: "/#projects" },
+  { label: "04. Skills", href: "/#skills" },
+  { label: "05. Certifications", href: "/#certifications" },
+  { label: "06. Automation", href: "/#automation" },
+  { label: "07. Contact", href: "/#contact" },
   { label: "Blog", href: "/blog" },
   { label: "Playground", href: "/playground" },
-  { label: "Contact", href: "/#contact" },
 ];
 
 export const FEATURED_PROJECTS: Project[] = [

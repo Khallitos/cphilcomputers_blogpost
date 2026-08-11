@@ -51,8 +51,9 @@ const personJsonLd = {
   jobTitle: "IT Infrastructure Engineer & Full-Stack Developer",
   sameAs: [
     "https://github.com/Khallitos",
-    "https://linkedin.com/in/carlosphilips66774216a",
+    "https://www.linkedin.com/in/carlos-philips-66774216a/",
     "https://instagram.com/carl_philzz",
+    "https://www.youtube.com/@AfroFusionBuzz",
   ],
 };
 
@@ -78,10 +79,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <Nav />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        {/* Offset the content column for the fixed desktop sidebar */}
+        <div className="flex min-h-full flex-1 flex-col lg:pl-64">
+          <main id="main" className="flex-1 pt-16 lg:pt-0">
+            {children}
+          </main>
+          <Footer />
+        </div>
         <CommandPaletteWrapper />
       </body>
     </html>

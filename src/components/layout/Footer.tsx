@@ -2,8 +2,12 @@ import Link from "next/link";
 
 const SOCIALS = [
   { label: "GitHub", href: "https://github.com/Khallitos" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/carlosphilips66774216a" },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/carlos-philips-66774216a/",
+  },
   { label: "Instagram", href: "https://instagram.com/carl_philzz" },
+  { label: "YouTube", href: "https://www.youtube.com/@AfroFusionBuzz" },
   { label: "Email", href: "mailto:carlphil9924@gmail.com" },
 ];
 

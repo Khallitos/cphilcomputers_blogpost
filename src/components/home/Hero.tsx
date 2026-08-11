@@ -5,18 +5,34 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 pb-24 pt-28 text-center"
+      className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-6 pb-24 pt-28"
     >
-      <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-        <TypingText text={SITE.name} />
+      <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+        Hi there! I&apos;m <span className="text-accent">Carlos Philips</span>.
       </h1>
-      <p className="max-w-2xl text-lg text-muted sm:text-xl">{SITE.roleLine}</p>
-      <p className="max-w-xl text-sm leading-relaxed text-muted">
+      <p className="text-xl text-foreground sm:text-2xl">
+        <TypingText text={SITE.roleLine} />
+      </p>
+      <p className="max-w-xl text-sm leading-relaxed text-muted sm:text-base">
         Five-plus years deploying critical systems across industrial, banking,
         and enterprise environments, with a zero-incident record on
         mission-critical work. Currently an MSc Enterprise &amp; IT Security
         candidate, and a full-stack developer who automates everything he can.
       </p>
+      <div className="mt-2 flex flex-wrap gap-4">
+        <a
+          href="/resume.pdf"
+          className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-secondary"
+        >
+          View Résumé
+        </a>
+        <a
+          href="#contact"
+          className="rounded-lg border border-border bg-surface px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:text-accent"
+        >
+          Get in touch
+        </a>
+      </div>
     </section>
   );
 }
