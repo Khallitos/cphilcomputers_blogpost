@@ -13,40 +13,27 @@ export type ArchivePost = {
 };
 
 /**
- * Client-side blog archive: tag filter chips + title search, plain JS only.
- * The active tag is initialized from the `?tag=` URL query param and kept in
- * sync with the URL so /blog?tag=<tag> links work on load and stay shareable.
+ * Presentational archive content (search input + tag chips + post list).
+ * Rendered twice: once as the Suspense fallback so the static HTML already
+ * contains the full archive, and once by the interactive inner component
+ * after hydration. The two renders produce identical DOM, so swapping the
+ * fallback for the hydrated content causes no layout shift.
  */
-function BlogArchiveInner({
+function ArchiveContent({
   posts,
   tags,
+  activeTag,
+  query,
+  onSelectTag,
+  onQueryChange,
 }: {
   posts: ArchivePost[];
   tags: string[];
+  activeTag: string | null;
+  query: string;
+  onSelectTag: (tag: string | null) => void;
+  onQueryChange: (query: string) => void;
 }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [activeTag, setActiveTag] = useState<string | null>(() => {
-    const tag = searchParams.get("tag");
-    return tag && tags.includes(tag) ? tag : null;
-  });
-  const [query, setQuery] = useState("");
-
-  const selectTag = (tag: string | null) => {
-    setActiveTag(tag);
-    const params = new URLSearchParams(searchParams.toString());
-    if (tag) {
-      params.set("tag", tag);
-      router.replace(`/blog?${params.toString()}`, { scroll: false });
-    } else {
-      params.delete("tag");
-      router.replace(params.size > 0 ? `/blog?${params.toString()}` : "/blog", {
-        scroll: false,
-      });
-    }
-  };
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return posts.filter((post) => {
@@ -66,7 +53,7 @@ function BlogArchiveInner({
           id="blog-search"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => onQueryChange(event.target.value)}
           placeholder="Search posts by title…"
           className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
         />
@@ -74,7 +61,7 @@ function BlogArchiveInner({
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filter posts by tag">
           <button
             type="button"
-            onClick={() => selectTag(null)}
+            onClick={() => onSelectTag(null)}
             aria-pressed={activeTag === null}
             className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
               activeTag === null
@@ -88,7 +75,7 @@ function BlogArchiveInner({
             <button
               key={tag}
               type="button"
-              onClick={() => selectTag(activeTag === tag ? null : tag)}
+              onClick={() => onSelectTag(activeTag === tag ? null : tag)}
               aria-pressed={activeTag === tag}
               className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
                 activeTag === tag
@@ -133,19 +120,73 @@ function BlogArchiveInner({
 }
 
 /**
- * Suspense boundary keeps the static shell of /blog prerendered while the
- * client component reads ?tag= from the URL after hydration.
+ * Client-side blog archive: tag filter chips + title search, plain JS only.
+ * The active tag is initialized from the `?tag=` URL query param and kept in
+ * sync with the URL so /blog?tag=<tag> links work on load and stay shareable.
+ */
+function BlogArchiveInner({
+  posts,
+  tags,
+}: {
+  posts: ArchivePost[];
+  tags: string[];
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [activeTag, setActiveTag] = useState<string | null>(() => {
+    const tag = searchParams.get("tag");
+    return tag && tags.includes(tag) ? tag : null;
+  });
+  const [query, setQuery] = useState("");
+
+  const selectTag = (tag: string | null) => {
+    setActiveTag(tag);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tag) {
+      params.set("tag", tag);
+      router.replace(`/blog?${params.toString()}`, { scroll: false });
+    } else {
+      params.delete("tag");
+      router.replace(params.size > 0 ? `/blog?${params.toString()}` : "/blog", {
+        scroll: false,
+      });
+    }
+  };
+
+  return (
+    <ArchiveContent
+      posts={posts}
+      tags={tags}
+      activeTag={activeTag}
+      query={query}
+      onSelectTag={selectTag}
+      onQueryChange={setQuery}
+    />
+  );
+}
+
+/**
+ * Suspense boundary lets the static shell of /blog be prerendered with the
+ * FULL archive in the initial HTML (fallback = same markup, inert). After
+ * hydration the interactive component swaps in with identical DOM, so the
+ * page height never changes and no layout shift occurs.
  */
 export default function BlogArchive(props: {
   posts: ArchivePost[];
   tags: string[];
 }) {
+  const noop = () => {};
   return (
     <Suspense
       fallback={
-        <div className="mt-10" aria-busy="true">
-          <p className="text-sm text-muted">Loading posts…</p>
-        </div>
+        <ArchiveContent
+          {...props}
+          activeTag={null}
+          query=""
+          onSelectTag={noop}
+          onQueryChange={noop}
+        />
       }
     >
       <BlogArchiveInner {...props} />
