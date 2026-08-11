@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { arrowHitsBalloon } from "@/lib/collision";
 
 /* ------------------------------------------------------------------ */
 /* Constants & pure helpers                                            */
@@ -9,11 +8,18 @@ import { arrowHitsBalloon } from "@/lib/collision";
 
 const VB_W = 800;
 const VB_H = 600;
+// Cannon-style pivot: the bow stays fixed on the left and only the
+// launch ANGLE changes (up/down aim).
 const BOW_X = 64;
-const BOW_MIN = 70;
-const BOW_MAX = 530;
-const TARGET_X = VB_W + 24; // arrow flies past the right edge
-const ARROW_FLIGHT_MS = 750;
+const BOW_Y = 320;
+const AIM_MIN = -15; // degrees (down)
+const AIM_MAX = 55; // degrees (up)
+const DEFAULT_ANGLE = 20;
+const AIM_LINE_LEN = 84;
+const LAUNCH_SPEED = 7; // px per 16.67 ms frame
+const GRAVITY = 0.09; // px per frame^2 (at 60 fps)
+const MISS_MARGIN = 60; // off-screen margin before the arrow disappears
+const HIT_TOLERANCE = 8; // extra radius for forgiving distance collisions
 
 type Balloon = {
   id: number;
@@ -30,8 +36,6 @@ type Balloon = {
   driftAmplitude: number;
   color: string;
   secret: string;
-  /** Optional link shown alongside the secret once revealed. */
-  secretLink?: string;
 };
 
 // Teal (accent), pink, amber (secondary): three distinct colors.
@@ -82,16 +86,21 @@ const BALLOONS: readonly Balloon[] = [
   },
 ];
 
+// Squared hit radii, precomputed once (distance-based collision, no sqrt).
+const HIT_R2: readonly number[] = BALLOONS.map(
+  (b) => (b.radius + HIT_TOLERANCE) * (b.radius + HIT_TOLERANCE),
+);
+
 const balloonY = (b: Balloon, tick: number) =>
   b.baseY + Math.sin(tick * b.speed + b.phase) * b.amplitude;
 
 const balloonX = (b: Balloon, tick: number) =>
   b.x + Math.sin(tick * b.driftSpeed + b.driftPhase) * b.driftAmplitude;
 
-const easeOutCubic = (p: number) => 1 - Math.pow(1 - p, 3);
-
 const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
+
+const toDeg = (rad: number) => (rad * 180) / Math.PI;
 
 /* ------------------------------------------------------------------ */
 /* Audio: lazy AudioContext, short pop (noise burst + pitch drop)     */
@@ -117,6 +126,18 @@ function ensureAudio(): AudioContext | null {
     void audioCtx.resume();
   }
   return audioCtx;
+}
+
+function closeAudio() {
+  stopMusic();
+  if (audioCtx) {
+    try {
+      void audioCtx.close();
+    } catch {
+      /* noop */
+    }
+    audioCtx = null;
+  }
 }
 
 function playPop() {
@@ -234,42 +255,60 @@ function stopMusic() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Confetti particles                                                  */
+/* Confetti particles (imperative SVG elements, reused per frame)      */
 /* ------------------------------------------------------------------ */
 
 type Particle = {
-  id: number;
+  el: SVGGraphicsElement;
   x: number;
   y: number;
   vx: number;
   vy: number;
-  color: string;
   size: number;
   round: boolean;
   life: number;
   maxLife: number;
 };
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 function spawnConfetti(
   pool: React.MutableRefObject<Particle[]>,
   pid: React.MutableRefObject<number>,
+  container: SVGGElement | null,
   x: number,
   y: number,
   color: string,
 ) {
+  if (!container) return;
   const colors = [color, "var(--accent)", "var(--secondary)", "#e6edf3"];
   for (let i = 0; i < 16; i += 1) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 2 + Math.random() * 4.5;
+    const size = 3 + Math.random() * 4;
+    const round = Math.random() > 0.5;
+    const el = document.createElementNS(SVG_NS, round ? "circle" : "rect");
+    if (round) {
+      el.setAttribute("r", String(size / 2));
+      el.setAttribute("cx", String(x));
+      el.setAttribute("cy", String(y));
+    } else {
+      el.setAttribute("width", String(size));
+      el.setAttribute("height", String(size * 0.66));
+      el.setAttribute("x", String(x - size / 2));
+      el.setAttribute("y", String(y - size / 3));
+    }
+    el.setAttribute("fill", colors[i % colors.length]);
+    el.setAttribute("opacity", "1");
+    container.appendChild(el);
     pool.current.push({
-      id: pid.current,
+      el,
       x,
       y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 1.5,
-      color: colors[i % colors.length],
-      size: 3 + Math.random() * 4,
-      round: Math.random() > 0.5,
+      size,
+      round,
       life: 700 + Math.random() * 400,
       maxLife: 1100,
     });
@@ -301,29 +340,33 @@ export default function BalloonArrowGame() {
     () => false,
   );
 
-  const [tick, setTick] = useState(0);
-  const [bowY, setBowY] = useState(VB_H / 2);
+  // React state only for things that change on discrete events (input,
+  // pops). Everything animated per frame lives in refs below.
+  const [angle, setAngle] = useState(DEFAULT_ANGLE);
   const [popped, setPopped] = useState<number[]>([]);
   const [liveMsg, setLiveMsg] = useState("");
-  const [arrow, setArrow] = useState<{ x: number; y: number } | null>(null);
-  const [particles, setParticles] = useState<Particle[]>([]);
   const [musicMuted, setMusicMuted] = useState(false);
 
   const tickRef = useRef(0);
+  const angleRef = useRef(DEFAULT_ANGLE);
   const reducedMotionRef = useRef(false);
-  const arrowRef = useRef<{ x: number; y: number } | null>(null);
-  const arrowProgressRef = useRef(0);
-  const poppedRef = useRef<number[]>([]);
-  const revealedRef = useRef<string[]>([]);
+  const musicMutedRef = useRef(false);
+  const arrowRef = useRef<{ x: number; y: number; vx: number; vy: number } | null>(
+    null,
+  );
+  // In-place popped flags (indexed by balloon id) for the hot loop.
+  const poppedFlagsRef = useRef<boolean[]>(BALLOONS.map(() => false));
   const particlesRef = useRef<Particle[]>([]);
   const pidRef = useRef(0);
-  const musicMutedRef = useRef(false);
 
-  // Keep refs in sync for the animation loop (no extra renders).
+  // SVG element refs mutated directly each frame (no React re-renders).
+  const balloonElsRef = useRef<(SVGGElement | null)[]>([]);
+  const arrowElRef = useRef<SVGGElement | null>(null);
+  const particleGRef = useRef<SVGGElement | null>(null);
+
   useEffect(() => {
-    tickRef.current = tick;
     reducedMotionRef.current = reducedMotion;
-  }, [tick, reducedMotion]);
+  }, [reducedMotion]);
 
   const allPopped = popped.length === BALLOONS.length;
 
@@ -331,123 +374,189 @@ export default function BalloonArrowGame() {
 
   useEffect(() => {
     let raf = 0;
+    let running = true;
     let last = performance.now();
 
-    const loop = (now: number) => {
-      const dt = Math.min(50, now - last);
-      last = now;
+    const step = (dt: number) => {
+      const s = dt / 16.667; // normalize to 60 fps
+      const rm = reducedMotionRef.current;
 
-      // Arrow flight + collision.
-      const arrow = arrowRef.current;
-      if (arrow) {
-        arrowProgressRef.current = Math.min(
-          1,
-          arrowProgressRef.current + dt / ARROW_FLIGHT_MS,
-        );
-        arrow.x = BOW_X + (TARGET_X - BOW_X) * easeOutCubic(arrowProgressRef.current);
+      tickRef.current += s;
+      const tickVal = tickRef.current;
 
-        if (arrowProgressRef.current >= 1) {
-          arrowRef.current = null;
-          setArrow(null);
-        } else {
-          const tickVal = tickRef.current;
-          let hit = false;
-          for (const b of BALLOONS) {
-            if (poppedRef.current.includes(b.id)) continue;
-            const by = reducedMotionRef.current ? b.baseY : balloonY(b, tickVal);
-            const bx = reducedMotionRef.current ? b.x : balloonX(b, tickVal);
-            if (
-              arrowHitsBalloon(
-                { x: arrow.x, y: arrow.y },
-                { x: bx, y: by, radius: b.radius },
-              )
-            ) {
-              poppedRef.current = [...poppedRef.current, b.id];
-              revealedRef.current = [...revealedRef.current, b.secret];
-              setPopped(poppedRef.current);
-              arrowRef.current = null;
-              arrowProgressRef.current = 0;
-              setArrow(null);
-              playPop();
-              spawnConfetti(particlesRef, pidRef, bx, by, b.color);
-              setLiveMsg(`Balloon popped; secret revealed: ${b.secret}`);
-              hit = true;
-              break;
-            }
-          }
-          if (!hit) setArrow({ x: arrow.x, y: arrow.y });
+      // Balloons bob in place — direct transform writes, no renders.
+      if (!rm) {
+        for (let i = 0; i < BALLOONS.length; i += 1) {
+          if (poppedFlagsRef.current[i]) continue;
+          const el = balloonElsRef.current[i];
+          if (!el) continue;
+          const b = BALLOONS[i];
+          el.setAttribute(
+            "transform",
+            `translate(${balloonX(b, tickVal)} ${balloonY(b, tickVal)})`,
+          );
         }
       }
 
-      // Confetti physics (gravity; skipped under reduced motion).
-      const gravity = reducedMotionRef.current ? 0 : 0.09;
-      const aliveParticles = particlesRef.current
-        .map((p) => ({
-          ...p,
-          x: p.x + p.vx * (dt / 16.67),
-          y: p.y + p.vy * (dt / 16.67),
-          vy: p.vy + gravity * (dt / 16.67),
-          life: p.life - dt,
-        }))
-        .filter((p) => p.life > 0);
-      particlesRef.current = aliveParticles;
-      if (aliveParticles.length > 0) {
-        setParticles([...aliveParticles]);
-      } else {
-        // Clear the render copy only when it still has particles.
-        setParticles((prev) => (prev.length === 0 ? prev : []));
+      // Cannonball arrow: parabolic arc under gravity, distance-based
+      // collision against every balloon center on every frame.
+      const arrow = arrowRef.current;
+      if (arrow) {
+        arrow.vy += GRAVITY * s;
+        arrow.x += arrow.vx * s;
+        arrow.y += arrow.vy * s;
+        const el = arrowElRef.current;
+        if (el) {
+          el.setAttribute(
+            "transform",
+            `translate(${arrow.x} ${arrow.y}) rotate(${toDeg(
+              Math.atan2(-arrow.vy, arrow.vx),
+            )})`,
+          );
+        }
+
+        let hit = false;
+        for (let i = 0; i < BALLOONS.length; i += 1) {
+          if (poppedFlagsRef.current[i]) continue;
+          const b = BALLOONS[i];
+          const bx = rm ? b.x : balloonX(b, tickVal);
+          const by = rm ? b.baseY : balloonY(b, tickVal);
+          const dx = arrow.x - bx;
+          const dy = arrow.y - by;
+          if (dx * dx + dy * dy <= HIT_R2[i]) {
+            poppedFlagsRef.current[i] = true;
+            setPopped((prev) => [...prev, i]);
+            arrowRef.current = null;
+            if (el) el.style.display = "none";
+            playPop();
+            spawnConfetti(particlesRef, pidRef, particleGRef.current, bx, by, b.color);
+            setLiveMsg(`Balloon popped; secret revealed: ${b.secret}`);
+            hit = true;
+            break;
+          }
+        }
+
+        // Missed everything: keep flying until it drops off-screen.
+        if (
+          !hit &&
+          (arrow.y > VB_H + MISS_MARGIN || arrow.x > VB_W + MISS_MARGIN)
+        ) {
+          arrowRef.current = null;
+          if (el) el.style.display = "none";
+        }
       }
 
-      const animating =
-        Boolean(arrowRef.current) ||
-        particlesRef.current.length > 0 ||
-        !reducedMotionRef.current;
-      if (animating) setTick((t) => t + 1);
-      raf = requestAnimationFrame(loop);
+      // Confetti physics — mutate in place, compact dead particles,
+      // remove their DOM nodes. No allocations per frame.
+      const parts = particlesRef.current;
+      if (parts.length > 0) {
+        let write = 0;
+        for (let i = 0; i < parts.length; i += 1) {
+          const p = parts[i];
+          p.life -= dt;
+          if (p.life <= 0) {
+            if (p.el.parentNode) p.el.parentNode.removeChild(p.el);
+            continue;
+          }
+          p.x += p.vx * s;
+          p.y += p.vy * s;
+          p.vy += (rm ? 0 : 0.09) * s;
+          const opacity = Math.max(0, p.life / p.maxLife);
+          if (p.round) {
+            p.el.setAttribute("cx", String(p.x));
+            p.el.setAttribute("cy", String(p.y));
+          } else {
+            p.el.setAttribute("x", String(p.x - p.size / 2));
+            p.el.setAttribute("y", String(p.y - p.size / 3));
+            p.el.setAttribute("transform", `rotate(${p.vy * 3} ${p.x} ${p.y})`);
+          }
+          p.el.setAttribute("opacity", String(opacity));
+          parts[write] = p;
+          write += 1;
+        }
+        parts.length = write;
+      }
     };
 
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      const dt = Math.min(50, now - last);
+      last = now;
+      step(dt);
+    };
+
+    // Pause the loop entirely when the tab is hidden; resume on visible.
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(raf);
+      } else if (!running) {
+        running = true;
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
     raf = requestAnimationFrame(loop);
+
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       stopMusic();
+      closeAudio();
     };
   }, []);
 
   /* --------------------------- input ------------------------------- */
 
-  const toViewBoxY = (clientY: number, el: HTMLElement) => {
+  const toViewBox = (clientX: number, clientY: number, el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
     const scale = Math.max(rect.width / VB_W, rect.height / VB_H);
+    const offsetX = (rect.width - VB_W * scale) / 2;
     const offsetY = (rect.height - VB_H * scale) / 2;
-    return (clientY - rect.top - offsetY) / scale;
+    return {
+      x: (clientX - rect.left - offsetX) / scale,
+      y: (clientY - rect.top - offsetY) / scale,
+    };
   };
 
-  const aimAt = (clientY: number, el: HTMLElement) => {
+  const aimAt = (clientX: number, clientY: number, el: HTMLElement) => {
     if (allPopped) return;
-    setBowY(clamp(toViewBoxY(clientY, el), BOW_MIN, BOW_MAX));
+    const { x, y } = toViewBox(clientX, clientY, el);
+    const next = clamp(toDeg(Math.atan2(BOW_Y - y, x - BOW_X)), AIM_MIN, AIM_MAX);
+    angleRef.current = next;
+    setAngle(next);
   };
 
   const fire = () => {
-    if (arrowRef.current || allPopped) return;
+    if (arrowRef.current || poppedFlagsRef.current.every(Boolean)) return;
     ensureAudio();
-    const fired = { x: BOW_X + 8, y: bowY };
-    arrowRef.current = fired;
-    arrowProgressRef.current = 0;
-    setArrow(fired);
-    setTick((t) => t + 1);
+    const rad = (angleRef.current * Math.PI) / 180;
+    const c = Math.cos(rad);
+    const s = Math.sin(rad);
+    arrowRef.current = {
+      x: BOW_X + 8 * c,
+      y: BOW_Y - 8 * s,
+      vx: LAUNCH_SPEED * c,
+      vy: -LAUNCH_SPEED * s,
+    };
+    if (arrowElRef.current) arrowElRef.current.style.display = "";
   };
 
   const replay = () => {
-    poppedRef.current = [];
+    poppedFlagsRef.current = BALLOONS.map(() => false);
     setPopped([]);
-    revealedRef.current = [];
     arrowRef.current = null;
-    arrowProgressRef.current = 0;
+    if (arrowElRef.current) arrowElRef.current.style.display = "none";
+    const g = particleGRef.current;
+    if (g) {
+      while (g.firstChild) g.removeChild(g.firstChild);
+    }
     particlesRef.current = [];
-    setArrow(null);
-    setParticles([]);
+    angleRef.current = DEFAULT_ANGLE;
+    setAngle(DEFAULT_ANGLE);
     setLiveMsg("Game reset. Pop all three balloons.");
-    setTick((t) => t + 1);
   };
 
   const toggleMusicMute = () => {
@@ -468,13 +577,13 @@ export default function BalloonArrowGame() {
     const target = e.target as HTMLElement;
     if (target.closest("button")) return;
     startMusic(musicMutedRef.current);
-    aimAt(e.clientY, e.currentTarget);
+    aimAt(e.clientX, e.clientY, e.currentTarget);
     fire();
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" || e.pointerType === "touch") {
-      aimAt(e.clientY, e.currentTarget);
+      aimAt(e.clientX, e.clientY, e.currentTarget);
     }
   };
 
@@ -483,10 +592,14 @@ export default function BalloonArrowGame() {
     startMusic(musicMutedRef.current);
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      setBowY((y) => clamp(y - 22, BOW_MIN, BOW_MAX));
+      const next = clamp(angleRef.current + 3, AIM_MIN, AIM_MAX);
+      angleRef.current = next;
+      setAngle(next);
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      setBowY((y) => clamp(y + 22, BOW_MIN, BOW_MAX));
+      const next = clamp(angleRef.current - 3, AIM_MIN, AIM_MAX);
+      angleRef.current = next;
+      setAngle(next);
     } else if (e.key === " " || e.key === "Spacebar") {
       e.preventDefault();
       fire();
@@ -495,11 +608,15 @@ export default function BalloonArrowGame() {
 
   /* --------------------------- render ------------------------------ */
 
+  const rad = (angle * Math.PI) / 180;
+  const aimX = BOW_X + Math.cos(rad) * AIM_LINE_LEN;
+  const aimY = BOW_Y - Math.sin(rad) * AIM_LINE_LEN;
+
   return (
     <div>
       <div
         role="application"
-        aria-label="Balloon pop game. Move the bow with the up and down arrows, drag, or mouse; press space or click to fire."
+        aria-label="Balloon pop game. Aim the launch angle with the up and down arrows, drag, or mouse; press space or click to fire."
         tabIndex={0}
         className="relative h-[460px] w-full touch-none select-none overflow-hidden rounded-2xl border border-border bg-surface outline-none focus-visible:ring-2 focus-visible:ring-accent sm:h-[600px]"
         onPointerDown={onPointerDown}
@@ -512,117 +629,92 @@ export default function BalloonArrowGame() {
           className="h-full w-full"
           aria-hidden="true"
         >
-          {/* Faint dotted aim line from the bow tip. */}
+          {/* Dotted aim line: short line rotated to the current launch angle. */}
           <line
-            x1={BOW_X + 4}
-            y1={bowY}
-            x2={VB_W}
-            y2={bowY}
+            x1={BOW_X + 6}
+            y1={BOW_Y}
+            x2={aimX}
+            y2={aimY}
             stroke="var(--muted)"
             strokeOpacity={0.45}
             strokeWidth={1.5}
             strokeDasharray="2 7"
           />
 
-          {/* Balloons (unpopped only). */}
-          {BALLOONS.filter((b) => !popped.includes(b.id)).map((b) => {
-            const y = reducedMotion ? b.baseY : balloonY(b, tick);
-            const x = reducedMotion ? b.x : balloonX(b, tick);
-            return (
-              <g key={b.id}>
-                {/* string */}
-                <path
-                  d={`M ${x} ${y + b.radius * 1.05} q 6 12 0 22`}
-                  stroke={b.color}
-                  strokeWidth={1.5}
-                  fill="none"
-                />
-                {/* body */}
-                <ellipse
-                  cx={x}
-                  cy={y}
-                  rx={b.radius}
-                  ry={b.radius * 1.15}
-                  fill={b.color}
-                  fillOpacity={0.85}
-                  stroke={b.color}
-                  strokeWidth={1.5}
-                />
-                {/* highlight */}
-                <ellipse
-                  cx={x - b.radius * 0.35}
-                  cy={y - b.radius * 0.45}
-                  rx={b.radius * 0.28}
-                  ry={b.radius * 0.2}
-                  fill="#ffffff"
-                  fillOpacity={0.3}
-                />
-                {/* knot */}
-                <path
-                  d={`M ${x - 6} ${y + b.radius * 1.05} l 6 7 l 6 -7 z`}
-                  fill={b.color}
-                />
-              </g>
-            );
-          })}
-
-          {/* Confetti burst. */}
-          {particles.map((p) =>
-            p.round ? (
-              <circle
-                key={p.id}
-                cx={p.x}
-                cy={p.y}
-                r={p.size / 2}
-                fill={p.color}
-                opacity={p.life / p.maxLife}
+          {/* Balloons (unpopped only) — transforms updated per frame via refs. */}
+          {BALLOONS.filter((b) => !popped.includes(b.id)).map((b) => (
+            <g
+              key={b.id}
+              ref={(el) => {
+                balloonElsRef.current[b.id] = el;
+              }}
+              transform={`translate(${b.x} ${b.baseY})`}
+            >
+              {/* string */}
+              <path
+                d={`M 0 ${b.radius * 1.05} q 6 12 0 22`}
+                stroke={b.color}
+                strokeWidth={1.5}
+                fill="none"
               />
-            ) : (
-              <rect
-                key={p.id}
-                x={p.x - p.size / 2}
-                y={p.y - p.size / 3}
-                width={p.size}
-                height={p.size * 0.66}
-                fill={p.color}
-                opacity={p.life / p.maxLife}
-                transform={`rotate(${p.vy * 3} ${p.x} ${p.y})`}
-              />
-            ),
-          )}
-
-          {/* Flying arrow with a small trail. */}
-          {arrow && (
-            <g>
-              <line
-                x1={arrow.x - 42}
-                y1={arrow.y}
-                x2={arrow.x - 24}
-                y2={arrow.y}
-                stroke="var(--accent)"
-                strokeOpacity={0.35}
+              {/* body */}
+              <ellipse
+                cx={0}
+                cy={0}
+                rx={b.radius}
+                ry={b.radius * 1.15}
+                fill={b.color}
+                fillOpacity={0.85}
+                stroke={b.color}
                 strokeWidth={1.5}
               />
-              <line
-                x1={arrow.x - 24}
-                y1={arrow.y}
-                x2={arrow.x}
-                y2={arrow.y}
-                stroke="var(--foreground)"
-                strokeWidth={2.5}
-                strokeLinecap="round"
+              {/* highlight */}
+              <ellipse
+                cx={-b.radius * 0.35}
+                cy={-b.radius * 0.45}
+                rx={b.radius * 0.28}
+                ry={b.radius * 0.2}
+                fill="#ffffff"
+                fillOpacity={0.3}
               />
+              {/* knot */}
               <path
-                d={`M ${arrow.x} ${arrow.y} l -9 -4 v 8 z`}
-                fill="var(--accent)"
+                d={`M -6 ${b.radius * 1.05} l 6 7 l 6 -7 z`}
+                fill={b.color}
               />
             </g>
-          )}
+          ))}
 
-          {/* Bow (fixed at left edge, follows aim). */}
-          <g>
+          {/* Confetti container — children created/destroyed imperatively. */}
+          <g ref={particleGRef} />
+
+          {/* Flying arrow — tip at origin, rotated to its velocity vector. */}
+          <g ref={arrowElRef} style={{ display: "none" }} transform="translate(0 0) rotate(0)">
+            <line
+              x1={-44}
+              y1={0}
+              x2={-26}
+              y2={0}
+              stroke="var(--accent)"
+              strokeOpacity={0.35}
+              strokeWidth={1.5}
+            />
+            <line
+              x1={-26}
+              y1={0}
+              x2={-6}
+              y2={0}
+              stroke="var(--foreground)"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+            />
+            <path d="M 0 0 l -9 -4 v 8 z" fill="var(--accent)" />
+          </g>
+
+          {/* Bow (fixed at left edge) — whole group rotates to the aim angle. */}
+          <g transform={`rotate(${-angle} ${BOW_X} ${BOW_Y})`}>
             <path
-              d={`M ${BOW_X} ${bowY - 46} Q ${BOW_X - 24} ${bowY} ${BOW_X} ${bowY + 46}`}
+              d={`M ${BOW_X} ${BOW_Y - 46} Q ${BOW_X - 24} ${BOW_Y} ${BOW_X} ${BOW_Y + 46}`}
               stroke="var(--secondary)"
               strokeWidth={5}
               fill="none"
@@ -630,30 +722,28 @@ export default function BalloonArrowGame() {
             />
             <line
               x1={BOW_X}
-              y1={bowY - 46}
+              y1={BOW_Y - 46}
               x2={BOW_X}
-              y2={bowY + 46}
+              y2={BOW_Y + 46}
               stroke="var(--muted)"
               strokeWidth={1.5}
             />
             {/* Nocked arrow when idle. */}
-            {!arrow && (
-              <g>
-                <line
-                  x1={BOW_X + 2}
-                  y1={bowY}
-                  x2={BOW_X + 28}
-                  y2={bowY}
-                  stroke="var(--foreground)"
-                  strokeWidth={2.5}
-                  strokeLinecap="round"
-                />
-                <path
-                  d={`M ${BOW_X + 28} ${bowY} l -8 -3.5 v 7 z`}
-                  fill="var(--accent)"
-                />
-              </g>
-            )}
+            <g>
+              <line
+                x1={BOW_X + 2}
+                y1={BOW_Y}
+                x2={BOW_X + 28}
+                y2={BOW_Y}
+                stroke="var(--foreground)"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              />
+              <path
+                d={`M ${BOW_X + 28} ${BOW_Y} l -8 -3.5 v 7 z`}
+                fill="var(--accent)"
+              />
+            </g>
           </g>
         </svg>
 
@@ -702,7 +792,7 @@ export default function BalloonArrowGame() {
 
         {/* Controls hint. */}
         <div className="pointer-events-none absolute bottom-3 left-4 rounded-md bg-background/70 px-2 py-1 font-mono text-[11px] text-muted">
-          ↑↓ / drag to aim · Space / click to fire
+          ↑↓ / drag to aim angle · Space / click to fire
         </div>
 
         {/* Completion overlay. */}
@@ -716,19 +806,7 @@ export default function BalloonArrowGame() {
               🎉
             </p>
             <p className="mt-3 text-lg font-semibold tracking-tight text-foreground">
-              You popped them all. Now you know the real me 🎉
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              And one more thing...{" "}
-              <a
-                href="https://www.youtube.com/@AfroFusionBuzz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-red-500 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                ▶️ Check out my YouTube channel
-                <span aria-hidden="true">↗</span>
-              </a>
+              You popped them all — now you know the real me 🎉
             </p>
             <button
               type="button"
@@ -760,22 +838,9 @@ export default function BalloonArrowGame() {
               }`}
             >
               {isRevealed ? (
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {b.secret}
-                  </p>
-                  {b.secretLink && (
-                    <a
-                      href={b.secretLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-red-500 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                    >
-                      youtube.com/@AfroFusionBuzz
-                      <span aria-hidden="true">↗</span>
-                    </a>
-                  )}
-                </div>
+                <p className="text-sm font-medium text-foreground">
+                  {b.secret}
+                </p>
               ) : (
                 <p className="text-sm text-muted">
                   <span aria-hidden="true">❓</span> Balloon {b.id + 1}
