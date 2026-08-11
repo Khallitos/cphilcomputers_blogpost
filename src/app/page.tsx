@@ -107,9 +107,9 @@ export default async function Home() {
             </div>
             <div className="space-y-4 text-base leading-relaxed text-foreground/90">
               <p>
-                I&apos;m an IT infrastructure engineer from Offenburg, Germany,
-                with five-plus years across data centers, banking systems, and
-                oil &amp; gas industrial environments.
+                I&apos;m an IT infrastructure engineer with five-plus years
+                across data centers, banking systems, and oil &amp; gas
+                industrial environments.
               </p>
               <p>
                 I&apos;ve spent my career where downtime isn&apos;t an option:
