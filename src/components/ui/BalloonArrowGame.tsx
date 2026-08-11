@@ -34,7 +34,7 @@ type Balloon = {
   secretLink?: string;
 };
 
-// Teal (accent), pink, amber (secondary) + YouTube red: four distinct colors.
+// Teal (accent), pink, amber (secondary): three distinct colors.
 // Medium difficulty: faster bobbing, bigger amplitudes, desynced phases and
 // a gentle horizontal drift keep every balloon on the move.
 const BALLOONS: readonly Balloon[] = [
@@ -79,21 +79,6 @@ const BALLOONS: readonly Balloon[] = [
     driftAmplitude: 13,
     color: "var(--secondary)",
     secret: "🎮 I love video games (Fortnite)",
-  },
-  {
-    id: 3,
-    x: 390,
-    baseY: 130,
-    radius: 34,
-    speed: 0.0064,
-    phase: 1.1,
-    amplitude: 60,
-    driftSpeed: 0.0028,
-    driftPhase: 3.9,
-    driftAmplitude: 12,
-    color: "#ff0000",
-    secret: "▶️ Follow my YouTube channel",
-    secretLink: "https://www.youtube.com/@AfroFusionBuzz",
   },
 ];
 
@@ -461,7 +446,7 @@ export default function BalloonArrowGame() {
     particlesRef.current = [];
     setArrow(null);
     setParticles([]);
-    setLiveMsg("Game reset. Pop all four balloons.");
+    setLiveMsg("Game reset. Pop all three balloons.");
     setTick((t) => t + 1);
   };
 
@@ -732,6 +717,18 @@ export default function BalloonArrowGame() {
             </p>
             <p className="mt-3 text-lg font-semibold tracking-tight text-foreground">
               You popped them all. Now you know the real me 🎉
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              And one more thing...{" "}
+              <a
+                href="https://www.youtube.com/@AfroFusionBuzz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-red-500 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                ▶️ Check out my YouTube channel
+                <span aria-hidden="true">↗</span>
+              </a>
             </p>
             <button
               type="button"

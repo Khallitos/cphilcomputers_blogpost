@@ -13,7 +13,7 @@ export default function PlaygroundPage() {
     <div className="mx-auto w-full max-w-3xl px-6 py-20">
       <h1 className="text-4xl font-bold tracking-tight">Playground</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Aim, fire, pop. Four balloons, four secrets about me.
+        Aim, fire, pop. Three balloons, four secrets about me.
       </p>
 
       <div className="mt-12">
