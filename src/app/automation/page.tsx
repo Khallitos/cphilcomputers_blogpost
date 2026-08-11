@@ -1,0 +1,136 @@
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+export const metadata: Metadata = {
+  title: "Automation Lab",
+};
+
+type AutomationCard = {
+  title: string;
+  icon: ReactNode;
+  body: string[];
+  href: string;
+};
+
+const CARDS: AutomationCard[] = [
+  {
+    title: "AI Agent Orchestration",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-6 w-6"
+        aria-hidden="true"
+      >
+        <circle cx="5" cy="12" r="2.2" />
+        <circle cx="19" cy="5" r="2.2" />
+        <circle cx="19" cy="19" r="2.2" />
+        <path d="M7.2 11.1 16.8 5.9M7.2 12.9l9.6 5.2" />
+      </svg>
+    ),
+    body: [
+      "Autonomous agents that draft content, run checks, and deploy — coordinated by an orchestrator that keeps each step honest.",
+      "Instead of one long prompt, a team of specialised agents builds, verifies, and ships while I review the pull request.",
+    ],
+    href: "/blog/running-my-blog-with-ai-agents",
+  },
+  {
+    title: "n8n",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-6 w-6"
+        aria-hidden="true"
+      >
+        <rect x="3" y="3" width="6" height="6" rx="1.5" />
+        <rect x="15" y="15" width="6" height="6" rx="1.5" />
+        <path d="M9 6h3a3 3 0 0 1 3 3v6" />
+      </svg>
+    ),
+    body: [
+      "Visual workflow automation for everything that repeats — my publish pipeline is a chain of small, testable steps.",
+      "Trigger → draft → commit → deploy: one webhook starts the whole run and each step only fires when the last one passes.",
+    ],
+    href: "/blog/running-my-blog-with-ai-agents",
+  },
+  {
+    title: "Power Automate",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-6 w-6"
+        aria-hidden="true"
+      >
+        <path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z" />
+      </svg>
+    ),
+    body: [
+      "Microsoft 365 flows that grease the daily grind — approval chains, onboarding automation, and the paperwork nobody wants to redo.",
+      "A new starter gets accounts, docs, and equipment assigned by one flow, with every approval tracked in the audit trail.",
+    ],
+    href: "/blog/running-my-blog-with-ai-agents",
+  },
+];
+
+export default function AutomationPage() {
+  return (
+    <div className="mx-auto w-full max-w-3xl px-6 py-20">
+      <h1 className="text-4xl font-bold tracking-tight">Automation Lab</h1>
+      <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
+        The machines I build to do the boring parts — so I can do the
+        interesting ones.
+      </p>
+
+      <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        {CARDS.map((card) => (
+          <article
+            key={card.title}
+            className="flex flex-col rounded-xl border border-border bg-surface p-6"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
+              {card.icon}
+            </div>
+            <h2 className="mt-4 text-lg font-semibold tracking-tight text-foreground">
+              {card.title}
+            </h2>
+            <div className="mt-2 space-y-2">
+              {card.body.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className="text-sm leading-relaxed text-muted"
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+            <a
+              href={card.href}
+              className="mt-auto pt-5 text-sm font-medium text-accent transition-colors hover:text-secondary"
+            >
+              Read more →
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <p className="mt-12 rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-sm leading-relaxed text-muted">
+        Automation is how I multiply my time — the workflows above run my
+        day-to-day.
+      </p>
+    </div>
+  );
+}
