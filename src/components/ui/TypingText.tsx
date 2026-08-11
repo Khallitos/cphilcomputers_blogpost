@@ -26,7 +26,9 @@ function Typewriter({
   text: string;
   speed: number;
 }) {
-  const [typed, setTyped] = useState("");
+  // Start with the full text so SSR renders it (good for LCP/SEO).
+  // After hydration the interval replays the typing animation.
+  const [typed, setTyped] = useState(text);
 
   useEffect(() => {
     let i = 0;
