@@ -15,6 +15,21 @@ type AutomationCard = {
   href: string;
 };
 
+type PipelineStep = {
+  step: string;
+  label: string;
+  sub?: string;
+};
+
+/** Publish pipeline: trigger → draft → checks → commit → deploy. */
+const PIPELINE: PipelineStep[] = [
+  { step: "01", label: "Trigger", sub: "Telegram message" },
+  { step: "02", label: "Agent drafts", sub: "content" },
+  { step: "03", label: "Run checks", sub: "lint / build / test" },
+  { step: "04", label: "Commit & push" },
+  { step: "05", label: "Auto-deploy" },
+];
+
 const CARDS: AutomationCard[] = [
   {
     title: "AI Agent Orchestration",
@@ -97,6 +112,100 @@ export default function AutomationPage() {
         The machines I build to do the boring parts — so I can do the
         interesting ones.
       </p>
+
+      {/* Publish pipeline workflow diagram */}
+      <section aria-labelledby="publish-pipeline" className="mt-12">
+        <h2
+          id="publish-pipeline"
+          className="text-xl font-semibold tracking-tight"
+        >
+          Publish pipeline
+        </h2>
+        <div className="mt-6 rounded-xl border border-border bg-surface/40 p-6">
+          <svg
+            viewBox="0 0 1000 130"
+            role="img"
+            aria-labelledby="publish-pipeline-title"
+            className="h-auto w-full"
+            style={{ fontFamily: "var(--font-sans)" }}
+          >
+            <title id="publish-pipeline-title">
+              Publish pipeline workflow: Telegram trigger, an agent drafts
+              content, checks run (lint, build, test), commit and push, then
+              auto-deploy
+            </title>
+            <defs>
+              <marker
+                id="pipeline-arrow"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M0 0 L10 5 L0 10 z" className="fill-accent" />
+              </marker>
+            </defs>
+
+            {PIPELINE.map((item, index) => {
+              const boxX = 20 + index * 200;
+              return (
+                <g key={item.step}>
+                  <rect
+                    x={boxX}
+                    y={35}
+                    width="160"
+                    height="60"
+                    rx="12"
+                    className="fill-surface stroke-border"
+                    strokeWidth="1.5"
+                  />
+                  <text
+                    x={boxX + 14}
+                    y={52}
+                    className="fill-accent"
+                    style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
+                  >
+                    {item.step}
+                  </text>
+                  <text
+                    x={boxX + 80}
+                    y={item.sub ? 63 : 66}
+                    textAnchor="middle"
+                    className="fill-foreground font-semibold"
+                    style={{ fontSize: 14 }}
+                  >
+                    {item.label}
+                  </text>
+                  {item.sub && (
+                    <text
+                      x={boxX + 80}
+                      y={80}
+                      textAnchor="middle"
+                      className="fill-muted"
+                      style={{ fontSize: 11 }}
+                    >
+                      {item.sub}
+                    </text>
+                  )}
+                  {index < PIPELINE.length - 1 && (
+                    <line
+                      x1={boxX + 166}
+                      y1={65}
+                      x2={boxX + 194}
+                      y2={65}
+                      strokeWidth={2}
+                      className="stroke-accent"
+                      markerEnd="url(#pipeline-arrow)"
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </section>
 
       <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
         {CARDS.map((card) => (
