@@ -3,7 +3,10 @@ import { SITE } from "@/lib/site";
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 pb-24 pt-28 text-center">
+    <section
+      id="top"
+      className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 px-6 pb-24 pt-28 text-center"
+    >
       <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
         <TypingText text={SITE.name} />
       </h1>

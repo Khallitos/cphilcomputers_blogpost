@@ -32,14 +32,15 @@ export const SITE = {
 } as const;
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "About", href: "/about" },
+  { label: "About", href: "/#about" },
+  { label: "Experience", href: "/#experience" },
+  { label: "Projects", href: "/#projects" },
+  { label: "Skills", href: "/#skills" },
+  { label: "Certifications", href: "/#certifications" },
+  { label: "Automation", href: "/#automation" },
   { label: "Blog", href: "/blog" },
-  { label: "Projects", href: "/projects" },
-  { label: "Experience", href: "/experience" },
-  { label: "Certifications", href: "/certifications" },
-  { label: "Automation", href: "/automation" },
   { label: "Playground", href: "/playground" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export const FEATURED_PROJECTS: Project[] = [

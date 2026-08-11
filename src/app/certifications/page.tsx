@@ -20,7 +20,7 @@ export type Certification = {
 
 const CONTENT_FILE = path.join(process.cwd(), "content", "certifications.json");
 
-async function getCertifications(): Promise<Certification[]> {
+export async function getCertifications(): Promise<Certification[]> {
   const raw = await fs.readFile(CONTENT_FILE, "utf-8");
   return JSON.parse(raw) as Certification[];
 }

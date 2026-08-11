@@ -22,7 +22,7 @@ type PipelineStep = {
 };
 
 /** Publish pipeline: trigger → draft → checks → commit → deploy. */
-const PIPELINE: PipelineStep[] = [
+export const PIPELINE: PipelineStep[] = [
   { step: "01", label: "Trigger", sub: "Telegram message" },
   { step: "02", label: "Agent drafts", sub: "content" },
   { step: "03", label: "Run checks", sub: "lint / build / test" },
@@ -30,7 +30,7 @@ const PIPELINE: PipelineStep[] = [
   { step: "05", label: "Auto-deploy" },
 ];
 
-const CARDS: AutomationCard[] = [
+export const CARDS: AutomationCard[] = [
   {
     title: "AI Agent Orchestration",
     icon: (

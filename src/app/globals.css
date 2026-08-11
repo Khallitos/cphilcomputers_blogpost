@@ -54,6 +54,15 @@ body {
   color: var(--background);
 }
 
+/* Anchor navigation: keep the sticky nav from covering section headings. */
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
 /* Typing cursor blink (used by TypingText). */
 @keyframes blink {
   0%,

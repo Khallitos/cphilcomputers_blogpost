@@ -23,7 +23,9 @@ export default function ProjectCard({ project }: { project: Project }) {
         ))}
       </div>
       {project.href && (
-        <span className="text-sm font-medium text-accent">Visit site →</span>
+        <span className="text-sm font-medium text-accent">
+          {external ? "Visit site →" : "Details →"}
+        </span>
       )}
     </article>
   );

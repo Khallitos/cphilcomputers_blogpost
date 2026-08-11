@@ -10,7 +10,25 @@ export default function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isActive = (href: string) => pathname === href;
+  // Page links (Blog, Playground) get the active state; anchor links never do.
+  const isActive = (href: string) => !href.includes("#") && pathname === href;
+
+  // Anchor links scroll in place on the home page; on other pages the Link
+  // navigates to "/#section" and Next.js scrolls to the hash after loading.
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    const [, hash] = href.split("#");
+    if (pathname === "/" && hash) {
+      const el = document.getElementById(hash);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        setMenuOpen(false);
+      }
+    }
+  };
 
   const openPalette = () => {
     window.dispatchEvent(new Event("command-palette:toggle"));
@@ -37,6 +55,7 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 aria-current={active ? "page" : undefined}
                 className={`rounded-md px-2.5 py-1.5 text-sm transition-colors ${
                   active
@@ -98,8 +117,11 @@ export default function Nav() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={(e) => {
+                    handleNavClick(e, link.href);
+                    setMenuOpen(false);
+                  }}
                   aria-current={active ? "page" : undefined}
-                  onClick={() => setMenuOpen(false)}
                   className={`rounded-md px-3 py-2 text-sm transition-colors ${
                     active
                       ? "bg-accent/10 text-accent"

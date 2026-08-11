@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { NAV_LINKS } from "./nav-links";
 
 const TOGGLE_EVENT = "command-palette:toggle";
@@ -11,6 +11,7 @@ export default function CommandPalette() {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const router = useRouter();
+  const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
   const openRef = useRef(false);
 
@@ -28,6 +29,25 @@ export default function CommandPalette() {
   }, [query]);
 
   const clampedIndex = Math.min(activeIndex, items.length - 1);
+
+  // Anchor items scroll in place on the home page; anything else (or any
+  // anchor reached from another page) falls back to router navigation, and
+  // Next.js scrolls to the hash after the route loads.
+  const go = useCallback(
+    (href: string) => {
+      setOpen(false);
+      const [, hash] = href.split("#");
+      if (pathname === "/" && hash) {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }
+      router.push(href);
+    },
+    [pathname, router],
+  );
 
   // Ctrl+K / Cmd+K toggle (also usable from Nav's hint button via custom event).
   // Query/index are reset whenever the palette is (re)opened.
@@ -86,14 +106,13 @@ export default function CommandPalette() {
       } else if (e.key === "Enter") {
         const item = items[clampedIndex];
         if (item) {
-          router.push(item.href);
-          setOpen(false);
+          go(item.href);
         }
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, items, clampedIndex, router]);
+  }, [open, items, clampedIndex, go]);
 
   if (!open) return null;
 
@@ -150,10 +169,7 @@ export default function CommandPalette() {
                   <button
                     type="button"
                     onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => {
-                      router.push(item.href);
-                      setOpen(false);
-                    }}
+                    onClick={() => go(item.href)}
                     className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                       isActive
                         ? "bg-accent/10 text-accent"
