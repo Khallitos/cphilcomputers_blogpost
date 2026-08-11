@@ -108,7 +108,7 @@ export default function Nav() {
                 );
               })}
               <div className="mt-3 flex justify-center border-t border-border pt-4">
-                <SocialIcons className="flex-row gap-5" />
+                <SocialIcons className="flex-row items-center gap-5" />
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function Nav() {
                 <span>Menu</span>
               </button>
             </div>
-            <SocialIcons />
+            <SocialIcons className="flex-row items-center gap-5" />
           </div>
         </div>
       </header>

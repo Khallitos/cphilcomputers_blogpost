@@ -73,11 +73,16 @@ const ICONS: Record<string, () => ReactNode> = {
 /**
  * Social icon links (GitHub, LinkedIn, Instagram, YouTube) pulled from
  * SITE.socials. Defaults to a vertical column; pass a className override
- * (e.g. "flex-row gap-5") for horizontal rows.
+ * (e.g. "flex-row items-center gap-5") for a horizontal row. The direction
+ * class lives in the caller's className so it never fights the default.
  */
-export default function SocialIcons({ className = "" }: { className?: string }) {
+export default function SocialIcons({
+  className = "flex-col items-center gap-4",
+}: {
+  className?: string;
+}) {
   return (
-    <ul className={`flex flex-col items-center gap-4 ${className}`}>
+    <ul className={`flex ${className}`}>
       {SITE.socials
         .filter((social) => social.href.startsWith("http"))
         .map((social) => {

@@ -24,20 +24,31 @@ type Balloon = {
   speed: number;
   phase: number;
   amplitude: number;
+  /** Gentle horizontal drift so balloons never line up in a column. */
+  driftSpeed: number;
+  driftPhase: number;
+  driftAmplitude: number;
   color: string;
   secret: string;
+  /** Optional link shown alongside the secret once revealed. */
+  secretLink?: string;
 };
 
-// Teal (accent), pink, amber (secondary): three distinct balloon colors.
+// Teal (accent), pink, amber (secondary) + YouTube red: four distinct colors.
+// Medium difficulty: faster bobbing, bigger amplitudes, desynced phases and
+// a gentle horizontal drift keep every balloon on the move.
 const BALLOONS: readonly Balloon[] = [
   {
     id: 0,
     x: 470,
     baseY: 170,
     radius: 36,
-    speed: 0.0026,
+    speed: 0.0058,
     phase: 0,
-    amplitude: 55,
+    amplitude: 85,
+    driftSpeed: 0.0031,
+    driftPhase: 0,
+    driftAmplitude: 14,
     color: "var(--accent)",
     secret: "✈️ I love travelling",
   },
@@ -46,9 +57,12 @@ const BALLOONS: readonly Balloon[] = [
     x: 590,
     baseY: 320,
     radius: 38,
-    speed: 0.0034,
+    speed: 0.0072,
     phase: 2.1,
-    amplitude: 70,
+    amplitude: 92,
+    driftSpeed: 0.0042,
+    driftPhase: 1.3,
+    driftAmplitude: 16,
     color: "#f472b6",
     secret: "🍰 I love baking",
   },
@@ -57,16 +71,37 @@ const BALLOONS: readonly Balloon[] = [
     x: 700,
     baseY: 470,
     radius: 36,
-    speed: 0.002,
+    speed: 0.0049,
     phase: 4.2,
-    amplitude: 60,
+    amplitude: 80,
+    driftSpeed: 0.0036,
+    driftPhase: 2.6,
+    driftAmplitude: 13,
     color: "var(--secondary)",
     secret: "🎮 I love video games (Fortnite)",
+  },
+  {
+    id: 3,
+    x: 390,
+    baseY: 130,
+    radius: 34,
+    speed: 0.0064,
+    phase: 1.1,
+    amplitude: 60,
+    driftSpeed: 0.0028,
+    driftPhase: 3.9,
+    driftAmplitude: 12,
+    color: "#ff0000",
+    secret: "▶️ Follow my YouTube channel",
+    secretLink: "https://www.youtube.com/@AfroFusionBuzz",
   },
 ];
 
 const balloonY = (b: Balloon, tick: number) =>
   b.baseY + Math.sin(tick * b.speed + b.phase) * b.amplitude;
+
+const balloonX = (b: Balloon, tick: number) =>
+  b.x + Math.sin(tick * b.driftSpeed + b.driftPhase) * b.driftAmplitude;
 
 const easeOutCubic = (p: number) => 1 - Math.pow(1 - p, 3);
 
@@ -134,6 +169,83 @@ function playPop() {
   osc.connect(oscGain).connect(ctx.destination);
   osc.start(t);
   osc.stop(t + 0.14);
+}
+
+/* ------------------------------------------------------------------ */
+/* Background music: gentle looping synth arpeggio (Web Audio only)    */
+/* ------------------------------------------------------------------ */
+
+const MUSIC_VOLUME = 0.05;
+const NOTE_MS = 480;
+// C major pentatonic: C4 D4 E4 G4 A4 C5 — nothing dissonant.
+const PENTATONIC = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25];
+// Gentle up-down arpeggio (indices into PENTATONIC).
+const MUSIC_PATTERN = [0, 2, 4, 5, 4, 2, 3, 1];
+
+let musicGain: GainNode | null = null;
+let musicTimer: ReturnType<typeof setTimeout> | null = null;
+let musicStep = 0;
+
+function scheduleNextNote() {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const step = musicStep % MUSIC_PATTERN.length;
+  musicStep += 1;
+  const t = ctx.currentTime;
+
+  // Lead note: soft sine with a slow, natural decay.
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = PENTATONIC[MUSIC_PATTERN[step]];
+  const noteGain = ctx.createGain();
+  noteGain.gain.setValueAtTime(0.0001, t);
+  noteGain.gain.exponentialRampToValueAtTime(0.5, t + 0.04);
+  noteGain.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+  osc.connect(noteGain).connect(musicGain);
+  osc.start(t);
+  osc.stop(t + 1.7);
+
+  // Soft triangle bass every 4 steps (C3) to anchor the arpeggio.
+  if (step % 4 === 0) {
+    const bass = ctx.createOscillator();
+    bass.type = "triangle";
+    bass.frequency.value = 130.81;
+    const bassGain = ctx.createGain();
+    bassGain.gain.setValueAtTime(0.0001, t);
+    bassGain.gain.exponentialRampToValueAtTime(0.3, t + 0.06);
+    bassGain.gain.exponentialRampToValueAtTime(0.0001, t + 1.9);
+    bass.connect(bassGain).connect(musicGain);
+    bass.start(t);
+    bass.stop(t + 2.0);
+  }
+
+  musicTimer = setTimeout(scheduleNextNote, NOTE_MS);
+}
+
+function startMusic(muted: boolean) {
+  const ctx = ensureAudio();
+  if (!ctx || musicTimer !== null) return;
+  const master = ctx.createGain();
+  master.gain.value = muted ? 0 : MUSIC_VOLUME;
+  master.connect(ctx.destination);
+  musicGain = master;
+  musicStep = 0;
+  scheduleNextNote();
+}
+
+function stopMusic() {
+  if (musicTimer !== null) {
+    clearTimeout(musicTimer);
+    musicTimer = null;
+  }
+  if (musicGain) {
+    try {
+      musicGain.disconnect();
+    } catch {
+      /* noop */
+    }
+    musicGain = null;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -210,6 +322,7 @@ export default function BalloonArrowGame() {
   const [liveMsg, setLiveMsg] = useState("");
   const [arrow, setArrow] = useState<{ x: number; y: number } | null>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [musicMuted, setMusicMuted] = useState(false);
 
   const tickRef = useRef(0);
   const reducedMotionRef = useRef(false);
@@ -219,6 +332,7 @@ export default function BalloonArrowGame() {
   const revealedRef = useRef<string[]>([]);
   const particlesRef = useRef<Particle[]>([]);
   const pidRef = useRef(0);
+  const musicMutedRef = useRef(false);
 
   // Keep refs in sync for the animation loop (no extra renders).
   useEffect(() => {
@@ -256,10 +370,11 @@ export default function BalloonArrowGame() {
           for (const b of BALLOONS) {
             if (poppedRef.current.includes(b.id)) continue;
             const by = reducedMotionRef.current ? b.baseY : balloonY(b, tickVal);
+            const bx = reducedMotionRef.current ? b.x : balloonX(b, tickVal);
             if (
               arrowHitsBalloon(
                 { x: arrow.x, y: arrow.y },
-                { x: b.x, y: by, radius: b.radius },
+                { x: bx, y: by, radius: b.radius },
               )
             ) {
               poppedRef.current = [...poppedRef.current, b.id];
@@ -269,7 +384,7 @@ export default function BalloonArrowGame() {
               arrowProgressRef.current = 0;
               setArrow(null);
               playPop();
-              spawnConfetti(particlesRef, pidRef, b.x, by, b.color);
+              spawnConfetti(particlesRef, pidRef, bx, by, b.color);
               setLiveMsg(`Balloon popped; secret revealed: ${b.secret}`);
               hit = true;
               break;
@@ -307,7 +422,10 @@ export default function BalloonArrowGame() {
     };
 
     raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      stopMusic();
+    };
   }, []);
 
   /* --------------------------- input ------------------------------- */
@@ -343,30 +461,28 @@ export default function BalloonArrowGame() {
     particlesRef.current = [];
     setArrow(null);
     setParticles([]);
-    setLiveMsg("Game reset. Pop all three balloons.");
+    setLiveMsg("Game reset. Pop all four balloons.");
     setTick((t) => t + 1);
   };
 
-  const skip = () => {
+  const toggleMusicMute = () => {
     ensureAudio();
-    poppedRef.current = BALLOONS.map((b) => b.id);
-    revealedRef.current = BALLOONS.map((b) => b.secret);
-    setPopped(poppedRef.current);
-    arrowRef.current = null;
-    arrowProgressRef.current = 0;
-    particlesRef.current = [];
-    setArrow(null);
-    setParticles([]);
-    setLiveMsg(
-      "All secrets revealed: travelling, baking, and video games.",
-    );
-    setTick((t) => t + 1);
+    const next = !musicMutedRef.current;
+    musicMutedRef.current = next;
+    setMusicMuted(next);
+    if (musicGain && audioCtx) {
+      musicGain.gain.setTargetAtTime(
+        next ? 0 : MUSIC_VOLUME,
+        audioCtx.currentTime,
+        0.04,
+      );
+    }
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    ensureAudio();
     const target = e.target as HTMLElement;
     if (target.closest("button")) return;
+    startMusic(musicMutedRef.current);
     aimAt(e.clientY, e.currentTarget);
     fire();
   };
@@ -378,13 +494,13 @@ export default function BalloonArrowGame() {
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    startMusic(musicMutedRef.current);
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      ensureAudio();
       setBowY((y) => clamp(y - 22, BOW_MIN, BOW_MAX));
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      ensureAudio();
       setBowY((y) => clamp(y + 22, BOW_MIN, BOW_MAX));
     } else if (e.key === " " || e.key === "Spacebar") {
       e.preventDefault();
@@ -426,18 +542,19 @@ export default function BalloonArrowGame() {
           {/* Balloons (unpopped only). */}
           {BALLOONS.filter((b) => !popped.includes(b.id)).map((b) => {
             const y = reducedMotion ? b.baseY : balloonY(b, tick);
+            const x = reducedMotion ? b.x : balloonX(b, tick);
             return (
               <g key={b.id}>
                 {/* string */}
                 <path
-                  d={`M ${b.x} ${y + b.radius * 1.05} q 6 12 0 22`}
+                  d={`M ${x} ${y + b.radius * 1.05} q 6 12 0 22`}
                   stroke={b.color}
                   strokeWidth={1.5}
                   fill="none"
                 />
                 {/* body */}
                 <ellipse
-                  cx={b.x}
+                  cx={x}
                   cy={y}
                   rx={b.radius}
                   ry={b.radius * 1.15}
@@ -448,7 +565,7 @@ export default function BalloonArrowGame() {
                 />
                 {/* highlight */}
                 <ellipse
-                  cx={b.x - b.radius * 0.35}
+                  cx={x - b.radius * 0.35}
                   cy={y - b.radius * 0.45}
                   rx={b.radius * 0.28}
                   ry={b.radius * 0.2}
@@ -457,7 +574,7 @@ export default function BalloonArrowGame() {
                 />
                 {/* knot */}
                 <path
-                  d={`M ${b.x - 6} ${y + b.radius * 1.05} l 6 7 l 6 -7 z`}
+                  d={`M ${x - 6} ${y + b.radius * 1.05} l 6 7 l 6 -7 z`}
                   fill={b.color}
                 />
               </g>
@@ -555,6 +672,49 @@ export default function BalloonArrowGame() {
           </g>
         </svg>
 
+        {/* Music mute/unmute toggle. */}
+        <button
+          type="button"
+          onClick={toggleMusicMute}
+          aria-label={musicMuted ? "Unmute music" : "Mute music"}
+          aria-pressed={musicMuted}
+          className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-muted transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {musicMuted ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+              aria-hidden="true"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" x2="17" y1="9" y2="15" />
+              <line x1="17" x2="23" y1="9" y2="15" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+              aria-hidden="true"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+          )}
+        </button>
+
         {/* Controls hint. */}
         <div className="pointer-events-none absolute bottom-3 left-4 rounded-md bg-background/70 px-2 py-1 font-mono text-[11px] text-muted">
           ↑↓ / drag to aim · Space / click to fire
@@ -590,7 +750,7 @@ export default function BalloonArrowGame() {
       </p>
 
       {/* Secret slots. */}
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {BALLOONS.map((b) => {
           const isRevealed = popped.includes(b.id);
           return (
@@ -603,7 +763,22 @@ export default function BalloonArrowGame() {
               }`}
             >
               {isRevealed ? (
-                <p className="text-sm font-medium text-foreground">{b.secret}</p>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {b.secret}
+                  </p>
+                  {b.secretLink && (
+                    <a
+                      href={b.secretLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-red-500 transition-colors hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    >
+                      youtube.com/@AfroFusionBuzz
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                </div>
               ) : (
                 <p className="text-sm text-muted">
                   <span aria-hidden="true">❓</span> Balloon {b.id + 1}
@@ -612,16 +787,6 @@ export default function BalloonArrowGame() {
             </div>
           );
         })}
-      </div>
-
-      <div className="mt-3 flex justify-end">
-        <button
-          type="button"
-          onClick={skip}
-          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          Skip game &amp; reveal all
-        </button>
       </div>
     </div>
   );
