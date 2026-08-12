@@ -108,26 +108,12 @@ export default async function Home() {
               <p>
                 I&apos;m a system administrator and IT infrastructure engineer
                 with five-plus years keeping critical systems running across
-                banking and FinTech, oil and gas, and software development. My
-                work sits where security and reliability meet: dependable
-                infrastructure you can trust, hardened end to end.
-              </p>
-              <p>
-                The through-line of my career is zero-error delivery on
-                mission-critical systems. I&apos;ve kept a national
-                check-clearing network alive across more than a hundred bank
-                workstations, modernized endpoint and identity management with
-                Microsoft Intune and Entra ID for hundreds of users, and
-                secured the systems behind oil and gas operations, all while
-                enforcing the same discipline that earned a zero-incident
-                record.
-              </p>
-              <p>
-                Today I&apos;m deepening that with an MSc in Enterprise and IT
-                Security, because the systems I build have to be safe as well
-                as stable. When I&apos;m not hardening infrastructure,
-                I&apos;m building full-stack applications, or popping balloons
-                on this very site.
+                banking, oil and gas, and software development. Trusted for
+                zero-error delivery on mission-critical work, from national
+                check-clearing networks to Microsoft Intune and Entra ID
+                rollouts and secured industrial operations. Now deepening that
+                with an MSc in Enterprise and IT Security, while building
+                full-stack apps and AI automation on the side.
               </p>
             </div>
           </div>
