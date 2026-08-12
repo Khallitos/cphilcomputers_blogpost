@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   },
   description:
     "Personal site and blog of Carlos Philips: System Administrator, Full-Stack Developer, and AI Automation.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/app-icon.png",
+  },
   openGraph: {
     type: "website",
     siteName: SITE.name,

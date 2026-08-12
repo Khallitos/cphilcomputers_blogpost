@@ -43,9 +43,10 @@ export default function Nav() {
   const brand = (
     <Link
       href="/"
-      className="shrink-0 text-lg font-bold tracking-tight text-foreground"
+      className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-foreground"
     >
-      Carlos <span className="text-accent">Philips</span>
+      <img src="/cphil-logo.svg" alt="" className="h-6 w-6" aria-hidden="true" />
+      <span>cphilcomputers</span>
     </Link>
   );
 

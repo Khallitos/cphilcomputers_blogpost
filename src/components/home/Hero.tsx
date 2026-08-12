@@ -24,7 +24,13 @@ export default function Hero() {
           href="/resume.pdf"
           className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-secondary"
         >
-          View Résumé
+          Download CV (English)
+        </a>
+        <a
+          href="/Carlos_Philips_CV_DE.pdf"
+          className="rounded-lg border border-border bg-surface px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:text-accent"
+        >
+          Download CV (Deutsch)
         </a>
         <a
           href="#contact"
