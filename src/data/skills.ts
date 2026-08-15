@@ -17,6 +17,19 @@ export const SKILL_GROUPS: SkillGroup[] = [
     ],
   },
   {
+    group: "Hardware Repairs & Maintenance",
+    skills: [
+      "UPS systems",
+      "PLC racks",
+      "I/O modules",
+      "Check scanner hardware",
+      "Structured cabling",
+      "Fiber optic installation",
+      "Rack mounting",
+      "FRU replacement",
+    ],
+  },
+  {
     group: "Microsoft Endpoint & Cloud",
     skills: [
       "Intune",
@@ -65,7 +78,7 @@ export const SKILL_GROUPS: SkillGroup[] = [
   },
   {
     group: "AI & Automation",
-    skills: ["Power Automate", "n8n", "Hermes Agent orchestration"],
+    skills: ["Power Automate", "n8n", "Hermes Agent"],
   },
   {
     group: "Development",

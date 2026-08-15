@@ -44,14 +44,12 @@ export default function AboutPage() {
 
         <div className="mt-6 space-y-4 text-base leading-relaxed text-foreground/90">
           <p>
-            I&apos;m a system administrator and IT infrastructure engineer with
-            five-plus years keeping critical systems running across banking,
-            oil and gas, and software development. Trusted for zero-error
-            delivery on mission-critical work, from national check-clearing
-            networks to Microsoft Intune and Entra ID rollouts and secured
-            industrial operations. Now deepening that with an MSc in Enterprise
-            and IT Security, while building full-stack apps and AI automation
-            on the side.
+            Experienced IT professional with a five-year background spanning IT
+            support, enterprise networking, and workflow automation across the
+            banking, oil and gas, and software industries. Proven track record
+            of keeping mission-critical infrastructure running smoothly,
+            resolving escalations quickly, and using automation to make IT
+            operations faster, safer, and more efficient.
           </p>
         </div>
       </div>
