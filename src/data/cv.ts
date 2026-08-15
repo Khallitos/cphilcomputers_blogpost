@@ -67,7 +67,7 @@ export const EXPERIENCE: Experience[] = [
     location: "Accra, Ghana",
     period: "May 2018 – Apr 2021",
     bullets: [
-      "Lead technician for the national check-clearing system across 100+ bank workstations.",
+      "Lead technician for the national check-clearing system: installed, configured, and maintained check-scanner hardware and software across more than 100 bank workstations.",
       "Operated GTU data center duties: monitoring, incident response, and escalation.",
       "Performed FRU maintenance and automated rack provisioning.",
       "Resolved 200+ tier-2/3 tickets with a 40% faster average resolution time.",
