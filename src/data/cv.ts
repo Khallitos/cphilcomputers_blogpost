@@ -42,7 +42,7 @@ export const EXPERIENCE: Experience[] = [
       "Administered the M365 tenant: Exchange Online, SharePoint, Teams, OneDrive, and licensing.",
       "Owned user onboarding/offboarding workflows end-to-end under Intune and M365.",
       "Automated routine IT workflows with PowerShell, Power Automate, and n8n, cutting manual task handling time.",
-      "Maintained UPS systems, PLC racks, I/O modules, and SCADA monitoring with zero incidents.",
+      "Performed hardware repairs and maintenance, including repairing of computer hardware, UPS systems, PLC racks, I/O modules, structured cabling, fiber optic installation, rack mounting and FRU replacement.",
       "Managed multi-site LANs: firewalls, Active Directory, and group policies.",
       "Linked remote sites via Ubiquiti EdgeMAX point-to-point radio links and fiber-optic cabling.",
       "Supported IP cameras, printers, and peripherals; climbed towers for antenna installations.",

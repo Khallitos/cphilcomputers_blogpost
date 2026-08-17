@@ -19,6 +19,7 @@ export const SKILL_GROUPS: SkillGroup[] = [
   {
     group: "Hardware Repairs & Maintenance",
     skills: [
+      "Repairing of computer hardware",
       "UPS systems",
       "PLC racks",
       "I/O modules",
