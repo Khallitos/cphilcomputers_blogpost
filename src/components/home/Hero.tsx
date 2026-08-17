@@ -14,10 +14,8 @@ export default function Hero() {
         <TypingText text={SITE.roleLine} />
       </p>
       <p className="max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-        Experienced IT professional with a five-year background in IT support,
-        enterprise networking, and workflow automation across banking, oil and
-        gas, and software industries — keeping mission-critical infrastructure
-        running and using automation to make IT operations faster and safer.
+        IT infrastructure engineer, full-stack developer and AI-automation
+        specialist.
       </p>
       <div className="mt-2 flex flex-wrap gap-4">
         <a
