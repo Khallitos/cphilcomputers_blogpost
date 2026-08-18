@@ -29,7 +29,7 @@
     "@types/rss": "^0.0.32",
     "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"
