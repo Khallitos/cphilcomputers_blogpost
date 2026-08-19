@@ -55,7 +55,7 @@ const personJsonLd = {
   name: SITE.name,
   url: SITE.url,
   jobTitle:
-    "System Administrator, Network & Systems Engineer, Microsoft Endpoint Administrator, Full-Stack Developer",
+    "System Administrator, Network Engineer, Automation & AI, Full Stack Developer",
   sameAs: [
     "https://github.com/Khallitos",
     "https://www.linkedin.com/in/carlos-philips-66774216a/",
